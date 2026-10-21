@@ -1,4 +1,5 @@
 import type { Db } from "@/server/db/client";
+import { extractProfileHandler } from "@/server/import/extract-profile";
 import { llmTestHandler } from "@/server/llm/test-handler";
 import type { Task, TaskType } from "./queue";
 
@@ -7,4 +8,5 @@ export type Handler = (task: Task, ctx: { db: Db; now: () => number }) => Promis
 /** Cada feature registra aqui o handler do seu tipo de tarefa. */
 export const handlers: Partial<Record<TaskType, Handler>> = {
   llm_test: llmTestHandler,
+  extract_profile: extractProfileHandler,
 };
