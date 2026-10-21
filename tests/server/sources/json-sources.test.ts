@@ -9,12 +9,14 @@ import { fixtureHttp, sourceFixture } from "../../helpers/http";
 const q = (keywords: string) => ({ keywords, location: null });
 
 describe("remotive", () => {
-  it("maps fields and strips HTML description", async () => {
+  it("fetches one category feed for every query and filters titles locally", async () => {
     const http = fixtureHttp([[/remotive\.com\/api/, sourceFixture("remotive.json")]]);
     const jobs = await remotiveSource.search(q("rails"), 1, http);
-    expect(http.urls[0]).toBe("https://remotive.com/api/remote-jobs?search=rails");
-    expect(jobs).toHaveLength(3);
-    expect(jobs[1]).toMatchObject({ source: "remotive", title: "Tech Lead Full-Stack Rails Engineer", workModelHint: "remote" });
+    await remotiveSource.search(q("assistant"), 1, http);
+    expect(http.urls[0]).toBe("https://remotive.com/api/remote-jobs?category=software-dev");
+    expect(new Set(http.urls).size).toBe(1);
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]).toMatchObject({ source: "remotive", title: "Tech Lead Full-Stack Rails Engineer", workModelHint: "remote" });
     expect(jobs[0].url).toMatch(/^https:\/\/remotive\.com\//);
     expect(jobs[0].postedAt).toBeInstanceOf(Date);
     expect(jobs[0].descriptionText).not.toMatch(/<p>/);

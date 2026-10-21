@@ -21,8 +21,14 @@ export async function saveLlmSettings(raw: unknown): Promise<{ ok: true } | { ok
   const db = getDb();
   const input = parsed.data;
 
-  setSetting(db, "llm.provider", input.provider);
-  setSetting(db, "llm.dailyCallCap", input.dailyCallCap);
+  // Valida antes de gravar: um provedor sem chave/endpoint nunca vira o ativo.
+  if (input.provider === "anthropic" && !input.anthropicApiKey && !getSetting(db, "llm.anthropicApiKey") && !process.env.ANTHROPIC_API_KEY) {
+    return { ok: false, error: "informe a chave da API da Anthropic" };
+  }
+  if (input.provider === "openai-compatible" && !input.openai && !getSetting(db, "llm.openaiCompatible")) {
+    return { ok: false, error: "informe a base URL e o modelo" };
+  }
+
   // Campo de chave vazio = manter a chave já salva.
   if (input.anthropicApiKey) setSetting(db, "llm.anthropicApiKey", input.anthropicApiKey);
   if (input.openai) {
@@ -33,12 +39,8 @@ export async function saveLlmSettings(raw: unknown): Promise<{ ok: true } | { ok
       apiKey: input.openai.apiKey || previous?.apiKey || "",
     });
   }
-  if (input.provider === "anthropic" && !getSetting(db, "llm.anthropicApiKey") && !process.env.ANTHROPIC_API_KEY) {
-    return { ok: false, error: "informe a chave da API da Anthropic" };
-  }
-  if (input.provider === "openai-compatible" && !getSetting(db, "llm.openaiCompatible")) {
-    return { ok: false, error: "informe a base URL e o modelo" };
-  }
+  setSetting(db, "llm.dailyCallCap", input.dailyCallCap);
+  setSetting(db, "llm.provider", input.provider);
   refresh();
   return { ok: true };
 }

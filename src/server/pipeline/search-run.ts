@@ -17,7 +17,13 @@ export const ENRICH_BATCH = 5;
 const PER_SOURCE_CONCURRENCY = 2;
 const SHORT_DESCRIPTION = 400;
 
+const STUCK_RUN_MS = 15 * 60_000;
+
 export function startSearchRun(db: Db, trigger: "manual" | "schedule", now: number): number {
+  // Uma rodada não leva 15 min; se ainda consta "rodando", morreu sem avisar.
+  db.$client
+    .prepare("update search_runs set status = 'interrupted', finished_at = ? where status = 'running' and started_at < ?")
+    .run(now, now - STUCK_RUN_MS);
   const running = db.$client.prepare("select id from search_runs where status = 'running' order by id desc limit 1").get() as
     | { id: number }
     | undefined;
@@ -104,7 +110,7 @@ export async function runSearch(
   opts: { runId: number; http?: Http; now?: () => number; sources?: JobSource[] },
 ): Promise<void> {
   const now = opts.now ?? Date.now;
-  const http = opts.http ?? createHttp();
+  const http = opts.http ?? getSharedHttp();
   const run = db.$client.prepare("select started_at from search_runs where id = ?").get(opts.runId) as
     | { started_at: number }
     | undefined;
@@ -165,8 +171,23 @@ export async function runSearch(
   db.$client.prepare("update search_runs set status = 'done', finished_at = ? where id = ?").run(now(), opts.runId);
 }
 
+let sharedHttp: Http | null = null;
+
+/** Um cliente por processo: o cache de 6 h das fontes vale entre rodadas, não só dentro de uma. */
+export function getSharedHttp(): Http {
+  sharedHttp ??= createHttp();
+  return sharedHttp;
+}
+
 export const searchRunHandler: Handler = async (task, { db, now }) => {
   const { runId } = task.payload as { runId: number };
-  await runSearch(db, { runId, now });
+  try {
+    await runSearch(db, { runId, now });
+  } catch (err) {
+    db.$client
+      .prepare("update search_runs set status = 'interrupted', finished_at = ? where id = ? and status = 'running'")
+      .run(now(), runId);
+    throw err;
+  }
   return { runId };
 };

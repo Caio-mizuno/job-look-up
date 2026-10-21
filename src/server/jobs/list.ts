@@ -37,6 +37,7 @@ export type JobListItem = {
   analysis: "done" | "pending" | "failed" | "none";
   enrichment: (Omit<Enrichment, "jobId"> & { stale: boolean }) | null;
   application: { id: number; status: ApplicationStatus } | null;
+  analysisError: string | null;
 };
 
 type Row = {
@@ -164,6 +165,7 @@ function toItem(r: Row, ctx: { profileVersion: string | null; lastVisitAt: numbe
         ? { ...data, matchScore: r.e_score, stale: r.e_version !== ctx.profileVersion }
         : null,
     application: r.app_id !== null && r.app_status ? { id: r.app_id, status: r.app_status } : null,
+    analysisError: r.analysis_error,
   };
 }
 

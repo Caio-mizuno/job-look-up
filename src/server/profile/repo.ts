@@ -14,9 +14,14 @@ function canonical(value: unknown): unknown {
   return value;
 }
 
-/** Hash do conteúdo: muda só quando o perfil muda de fato (independe da ordem das chaves). */
+/**
+ * Hash do que influencia a nota de match (independe da ordem das chaves). Dados de contato,
+ * respostas prontas e o CV mudam sem invalidar as análises já feitas.
+ */
 export function profileVersion(data: Profile): string {
-  return createHash("sha256").update(JSON.stringify(canonical(data))).digest("hex").slice(0, 16);
+  const { headline, summary, experiences, skills, education, languages, preferences } = data;
+  const relevant = { headline, summary, experiences, skills, education, languages, preferences };
+  return createHash("sha256").update(JSON.stringify(canonical(relevant))).digest("hex").slice(0, 16);
 }
 
 export function getProfile(db: Db): { data: Profile; version: string } | null {
@@ -31,6 +36,7 @@ export function saveProfile(db: Db, data: Profile, now: number): { version: stri
   const parsed = ProfileSchema.parse(data);
   const version = profileVersion(parsed);
   const previous = db.$client.prepare("select version from profile where id = 1").get() as { version: string } | undefined;
+  // `changed` = mudou o que afeta a nota; o resto do perfil é salvo do mesmo jeito.
   db.$client
     .prepare(
       `insert into profile (id, data, version, updated_at) values (1, ?, ?, ?)

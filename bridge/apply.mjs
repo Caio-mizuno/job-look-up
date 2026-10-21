@@ -88,6 +88,7 @@ export async function runApply(payload, { spawn = spawnClaude, onEvent = () => {
     }
 
     let resultText = "";
+    let resultError = null;
     const onLine = (line) => {
       let ev;
       try {
@@ -95,7 +96,10 @@ export async function runApply(payload, { spawn = spawnClaude, onEvent = () => {
       } catch {
         return;
       }
-      if (ev.type === "result") resultText = String(ev.result ?? "");
+      if (ev.type === "result") {
+        resultText = String(ev.result ?? "");
+        if (ev.is_error) resultError = resultText.trim().slice(0, 300) || "erro do Claude Code";
+      }
       if (ev.type !== "assistant") return;
       for (const c of ev.message?.content ?? []) {
         if (c.type === "text" && c.text?.trim()) onEvent({ at: Date.now(), kind: "text", text: c.text.trim().slice(0, 300) });
@@ -113,6 +117,8 @@ export async function runApply(payload, { spawn = spawnClaude, onEvent = () => {
     } catch (err) {
       return errorReport(err instanceof Error && err.message === "timeout" ? "timeout" : String(err?.message ?? err));
     }
+    // Limite do plano, login expirado etc.: o motivo real chega à tela de Candidaturas.
+    if (resultError) return errorReport(resultError);
     return normalizeReport(extractReport(resultText)) ?? errorReport("o Claude terminou sem relatório");
   } finally {
     await rm(cwd, { recursive: true, force: true });

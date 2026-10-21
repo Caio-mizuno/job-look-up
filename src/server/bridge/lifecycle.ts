@@ -14,7 +14,7 @@ export type BridgeResultBody = z.infer<typeof BridgeResultBody>;
 export function onClaim(db: Db, task: Task): void {
   if (task.type !== "apply") return;
   db.$client
-    .prepare("update applications set status = 'running', started_at = ? where task_id = ?")
+    .prepare("update applications set status = 'running', started_at = ? where task_id = ? and status != 'cancelled'")
     .run(Date.now(), task.id);
 }
 

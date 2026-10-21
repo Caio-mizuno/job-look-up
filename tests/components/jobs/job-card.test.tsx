@@ -23,6 +23,7 @@ const item = (over: Partial<JobListItem> = {}): JobListItem => ({
   analysis: "pending",
   enrichment: null,
   application: null,
+  analysisError: null,
   ...over,
 });
 
@@ -79,6 +80,18 @@ describe("JobCard", () => {
     expect(screen.getByText(/análise falhou/)).toBeInTheDocument();
     screen.getByRole("button", { name: /Tentar de novo/ }).click();
     expect(handlers.onRecalc).toHaveBeenCalledWith(1);
+  });
+
+  it("shows the failure reason", () => {
+    render(
+      <JobCard
+        job={item({ analysis: "failed", analysisError: "análise falhou: Claude usage limit reached" })}
+        bridgeOnline
+        compact={false}
+        {...handlers}
+      />,
+    );
+    expect(screen.getByText(/Claude usage limit reached/)).toBeInTheDocument();
   });
 
   it("offers 'Analisar' when the job was never queued", () => {

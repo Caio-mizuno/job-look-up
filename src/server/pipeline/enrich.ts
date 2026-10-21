@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { Db } from "@/server/db/client";
 import { ContractEnum, WorkModelEnum, type Contract, type WorkModel } from "@/server/domain/enums";
-import { LlmInvalidOutputError } from "@/server/llm/errors";
+import { LlmCapReachedError, LlmUnavailableError } from "@/server/llm/errors";
 import { generateObject } from "@/server/llm/index";
 import { ENRICH_SYSTEM } from "@/server/llm/prompts";
 import { getProfile } from "@/server/profile/repo";
@@ -115,10 +115,13 @@ export const enrichHandler = withLlmDefer(async (task, { db, now }) => {
       { db, now },
     ));
   } catch (err) {
-    // Na última tentativa marca as vagas como "análise falhou" em vez de deixar "analisando…" para sempre.
-    if (err instanceof LlmInvalidOutputError && task.attempts >= MAX_ATTEMPTS) {
+    // Ajudante desligado/teto: o withLlmDefer adia. Qualquer outro erro na última tentativa vira
+    // "análise falhou" com o motivo (limite do plano, timeout, saída inválida), nunca "analisando…" eterno.
+    const deferrable = err instanceof LlmUnavailableError || err instanceof LlmCapReachedError;
+    if (!deferrable && task.attempts >= MAX_ATTEMPTS) {
+      const reason = err instanceof Error ? err.message : String(err);
       const mark = db.$client.prepare("update jobs set analysis_error = ? where id = ?");
-      for (const j of jobs) mark.run("análise falhou", j.id);
+      for (const j of jobs) mark.run(`análise falhou: ${reason}`.slice(0, 160), j.id);
       return { failed: true };
     }
     throw err;

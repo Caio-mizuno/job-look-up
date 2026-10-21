@@ -139,7 +139,7 @@ describe("enrich handler", () => {
     db.$client.prepare("update tasks set attempts = 1 where id = ?").run(id);
     const task = claimNext(db, { runner: "worker" })!; // attempts → 2
     await expect(runEnrich(db, task, () => ({ resultados: "errado" }))).resolves.toMatchObject({ failed: true });
-    expect((db.$client.prepare("select analysis_error e from jobs where id = ?").get(a) as { e: string }).e).toBe("análise falhou");
+    expect((db.$client.prepare("select analysis_error e from jobs where id = ?").get(a) as { e: string }).e).toMatch(/^análise falhou: /);
   });
 
   it("invalid output on first attempt throws to retry", async () => {

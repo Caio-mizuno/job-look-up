@@ -128,3 +128,18 @@ describe("runApply", () => {
     expect(called).toBe(false);
   });
 });
+
+describe("runApply surfaces CLI errors", () => {
+  it("returns the is_error result text as the report notes", async () => {
+    const lines = ['{"type":"result","subtype":"success","is_error":true,"result":"Claude usage limit reached. Resets at 5am."}'];
+    const r = await runApply(payload(), {
+      spawn: async (_a, opts) => {
+        for (const l of lines) opts.onLine?.(l);
+        return { code: 1, stdout: lines.join("\n"), stderr: "" };
+      },
+      tmpRoot: tmpdir(),
+    });
+    expect(r.status).toBe("error");
+    expect(r.notes).toContain("usage limit");
+  });
+});

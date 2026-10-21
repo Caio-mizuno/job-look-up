@@ -78,7 +78,9 @@ export function JobCard({ job, bridgeOnline, compact, onOpen, onDiscard, onRecal
           {e ? (
             <MatchBar score={e.matchScore} muted={e.stale} />
           ) : job.analysis === "failed" ? (
-            <span className="text-destructive text-xs">{C.failed}</span>
+            <span className="text-destructive max-w-56 text-right text-xs" title={job.analysisError ?? undefined}>
+              {job.analysisError ?? C.failed}
+            </span>
           ) : job.analysis === "none" ? (
             <span className="text-muted-foreground text-xs">{C.notAnalyzed}</span>
           ) : (

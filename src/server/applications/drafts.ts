@@ -33,8 +33,12 @@ export const prepareApplyHandler = withLlmDefer(async (task, { db, now }) => {
     const drafts = await generateDrafts(db, app.jobId, now);
     db.$client.prepare("update applications set drafts = ? where id = ?").run(JSON.stringify(drafts), applicationId);
   }
+  // A pessoa pode ter cancelado enquanto a IA escrevia os rascunhos.
+  if (getApplication(db, applicationId)?.status === "cancelled") return { skipped: true };
   const taskId = enqueue(db, { type: "apply", runner: "bridge", payload: buildApplyPayload(db, applicationId) });
-  db.$client.prepare("update applications set task_id = ?, status = 'queued' where id = ?").run(taskId, applicationId);
+  db.$client
+    .prepare("update applications set task_id = ?, status = 'queued' where id = ? and status != 'cancelled'")
+    .run(taskId, applicationId);
   return { taskId };
 });
 

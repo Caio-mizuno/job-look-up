@@ -74,8 +74,14 @@ export function createApplication(db: Db, jobId: number, now: number): { id: num
     .run(jobId, now);
   const id = Number(res.lastInsertRowid);
   db.$client.prepare("update jobs set status = 'interested' where id = ? and status not in ('applied')").run(jobId);
-  enqueue(db, { type: "prepare_apply", payload: { applicationId: id } });
+  linkPrepareTask(db, id);
   return { id };
+}
+
+/** A candidatura aponta sempre para a tarefa em curso (prepare_apply e depois apply): o sync acompanha falhas das duas. */
+function linkPrepareTask(db: Db, id: number): void {
+  const taskId = enqueue(db, { type: "prepare_apply", payload: { applicationId: id } });
+  db.$client.prepare("update applications set task_id = ? where id = ?").run(taskId, id);
 }
 
 export function appendEvents(db: Db, id: number, events: ApplyEvent[]): void {
@@ -96,13 +102,13 @@ const REPORT_STATUS: Record<ApplyReport["status"], ApplicationStatus> = {
 export function applyReport(db: Db, id: number, report: ApplyReport, now: number): void {
   const status = REPORT_STATUS[report.status];
   db.$client
-    .prepare("update applications set status = ?, report = ?, error = ?, finished_at = ? where id = ?")
+    .prepare("update applications set status = ?, report = ?, error = ?, finished_at = ? where id = ? and status != 'cancelled'")
     .run(status, JSON.stringify(report), status === "failed" ? report.notes || report.status : null, now, id);
 }
 
 export function failApplication(db: Db, id: number, error: string, now: number): void {
   db.$client
-    .prepare("update applications set status = 'failed', error = ?, finished_at = ? where id = ?")
+    .prepare("update applications set status = 'failed', error = ?, finished_at = ? where id = ? and status != 'cancelled'")
     .run(error, now, id);
 }
 
@@ -130,10 +136,17 @@ export function retryApplication(db: Db, id: number, _now: number): void {
   db.$client
     .prepare("update applications set status = 'queued', error = null, report = null, started_at = null, finished_at = null where id = ?")
     .run(id);
-  enqueue(db, { type: "prepare_apply", payload: { applicationId: id } });
+  linkPrepareTask(db, id);
 }
 
+/** Cancela de verdade: a tarefa ainda na fila nunca chega ao ajudante. Uma já em execução termina sem mudar o status. */
 export function cancelApplication(db: Db, id: number): void {
+  db.$client
+    .prepare(
+      `update tasks set status = 'failed', error = 'cancelada'
+       where status = 'queued' and id = (select task_id from applications where id = ?)`,
+    )
+    .run(id);
   db.$client.prepare("update applications set status = 'cancelled' where id = ?").run(id);
 }
 
