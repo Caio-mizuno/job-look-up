@@ -1,0 +1,14 @@
+node_modules
+.next
+dist
+data
+.env
+.git
+.superpowers
+spike
+coverage
+docs
+tests
+bridge
+*.tsbuildinfo
+.DS_Store

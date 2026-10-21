@@ -1,0 +1,36 @@
+name: job-look-up
+
+x-common: &common
+  image: job-look-up:local
+  env_file: .env
+  environment:
+    DATA_DIR: /app/data
+  volumes:
+    - ./data:/app/data
+  user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *common
+    # Só o app constrói; o worker reusa a mesma imagem.
+    build: .
+    command: ["node", "server.js"]
+    # Só localhost: o app não tem login e guarda dados pessoais.
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  worker:
+    <<: *common
+    command: ["node", "dist/worker.mjs"]
+    depends_on:
+      app:
+        condition: service_healthy
