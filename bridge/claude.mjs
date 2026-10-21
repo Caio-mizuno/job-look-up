@@ -9,10 +9,10 @@ import { join } from "node:path";
  * - Sem `--bare`: ele força ANTHROPIC_API_KEY e quebra o uso da assinatura.
  * - `--setting-sources project` num cwd vazio isola hooks/plugins do usuário.
  * - A entrada vai por stdin (não aparece em `ps` e não esbarra no limite de argv).
- * @param {{ model: "haiku" | "sonnet", system: string, jsonSchema: object }} opts
+ * @param {{ model: "haiku" | "sonnet", effort?: "low" | "medium" | "high", system: string, jsonSchema: object }} opts
  * @returns {string[]}
  */
-export function buildLlmArgs({ model, system, jsonSchema }) {
+export function buildLlmArgs({ model, effort, system, jsonSchema }) {
   return [
     "-p",
     "--tools", "",
@@ -20,6 +20,7 @@ export function buildLlmArgs({ model, system, jsonSchema }) {
     "--strict-mcp-config",
     "--no-session-persistence",
     "--model", model,
+    ...(effort ? ["--effort", effort] : []),
     "--system-prompt", system,
     "--output-format", "json",
     "--json-schema", JSON.stringify(jsonSchema),

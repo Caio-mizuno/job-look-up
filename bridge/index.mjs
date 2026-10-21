@@ -12,7 +12,8 @@ const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 /** Executores por tipo de tarefa e quantas rodam ao mesmo tempo. */
 const EXECUTORS = {
-  llm_call: { slots: 2, run: (payload) => runLlmCall(payload) },
+  // 4 em paralelo: a análise das top 40 (8 lotes) fica perto de 1 minuto.
+  llm_call: { slots: 4, run: (payload) => runLlmCall(payload) },
 };
 
 const log = (msg) => console.log(`[bridge] ${msg}`);

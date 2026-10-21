@@ -1,6 +1,7 @@
 import type { Db } from "@/server/db/client";
 import { extractProfileHandler } from "@/server/import/extract-profile";
 import { llmTestHandler } from "@/server/llm/test-handler";
+import { enrichHandler } from "@/server/pipeline/enrich";
 import { generateQueriesHandler } from "@/server/pipeline/queries";
 import { searchRunHandler } from "@/server/pipeline/search-run";
 import type { Task, TaskType } from "./queue";
@@ -13,4 +14,5 @@ export const handlers: Partial<Record<TaskType, Handler>> = {
   extract_profile: extractProfileHandler,
   generate_queries: generateQueriesHandler,
   search_run: searchRunHandler,
+  enrich: enrichHandler,
 };

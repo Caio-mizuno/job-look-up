@@ -14,6 +14,12 @@ describe("buildLlmArgs", () => {
     expect(JSON.parse(a[a.indexOf("--json-schema") + 1])).toEqual({ type: "object" });
   });
 
+  it("passes --effort only when given", () => {
+    expect(buildLlmArgs({ model: "haiku", system: "s", jsonSchema: {} })).not.toContain("--effort");
+    const a = buildLlmArgs({ model: "haiku", effort: "low", system: "s", jsonSchema: {} });
+    expect(a[a.indexOf("--effort") + 1]).toBe("low");
+  });
+
   it("does not put the input in argv", () => {
     const a = buildLlmArgs({ model: "sonnet", system: "s", jsonSchema: {} });
     expect(a.join(" ")).not.toContain("SEGREDO");

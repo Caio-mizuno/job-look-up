@@ -27,7 +27,7 @@ describe("bridge provider", () => {
     const pending = provider.generate(req);
     await new Promise((r) => setTimeout(r, 20));
     const task = claimNext(db, { runner: "bridge", types: ["llm_call"] })!;
-    expect(task.payload).toEqual({ model: "haiku", system: "s", input: "i", jsonSchema: { type: "object" } });
+    expect(task.payload).toEqual({ model: "haiku", effort: "low", system: "s", input: "i", jsonSchema: { type: "object" } });
     completeTask(db, task.id, { structured: { ok: true }, usage: { inputTokens: 3, outputTokens: 2, costUsd: 0 } });
     await expect(pending).resolves.toEqual({
       object: { ok: true },
@@ -45,6 +45,7 @@ describe("bridge provider", () => {
     await new Promise((r) => setTimeout(r, 20));
     const row = db.$client.prepare("select payload from tasks").get() as { payload: string };
     expect(JSON.parse(row.payload).model).toBe("sonnet");
+    expect(JSON.parse(row.payload).effort).toBeUndefined();
     await pending;
   });
 });

@@ -1,6 +1,7 @@
 "use server";
 
 import { getDb } from "@/server/db/client";
+import { scheduleRecalc } from "@/server/pipeline/recalc";
 import { getProfile, saveProfile } from "@/server/profile/repo";
 import { ProfileSchema } from "@/server/profile/schema";
 
@@ -14,6 +15,8 @@ export async function saveFullProfile(
   const db = getDb();
   // O caminho do CV é do servidor; o cliente só sabe se existe.
   const cvPath = getProfile(db)?.data.cvPath ?? null;
-  const { changed } = saveProfile(db, { ...parsed.data, cvPath }, Date.now());
+  const { changed, version } = saveProfile(db, { ...parsed.data, cvPath }, Date.now());
+  // Notas antigas ficam visíveis como "perfil mudou" até a reanálise terminar.
+  if (changed) scheduleRecalc(db, version);
   return { ok: true, changed };
 }
