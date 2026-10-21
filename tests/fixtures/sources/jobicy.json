@@ -1,0 +1,82 @@
+{
+ "apiVersion": "2.2.19",
+ "documentationUrl": "https://jobi.cy/apidocs",
+ "friendlyNotice": "Thanks for using Jobicy API! Please ensure Jobicy is clearly credited with a direct link to the source, and all application buttons redirect to the original job URL provided in this feed. That’s all! You might be building something amazing, we wish you the best of luck!",
+ "jobCount": 5,
+ "lastUpdate": "2026-10-20T19:20:11+00:00",
+ "nextCursor": "AgAAAABq2G-AAAAAAGrWHckAAAAAAAJgwB-Q2QMYFmIcwihnqpZzvgG22Sc_8mCM_OmRpMeMYXyMCm3KUfrCFUkG2THR1LtkmBRIh9j4TyLfEjO_VTKoOeM",
+ "hasMore": true,
+ "appliedFilters": {
+  "count": 5,
+  "tag": "php"
+ },
+ "jobs": [
+  {
+   "id": 156089,
+   "url": "https://jobicy.com/jobs/156089-it-systems-devops-engineer",
+   "jobSlug": "156089-it-systems-devops-engineer",
+   "jobTitle": "IT Systems DevOps Engineer",
+   "companyName": "Cologix, Inc.",
+   "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2025/06/ab469e6c-221-1.png",
+   "jobIndustry": [
+    "DevOps & Infrastructure"
+   ],
+   "jobType": [
+    "Full-Time"
+   ],
+   "jobGeo": "USA",
+   "jobLevel": "Senior",
+   "jobExcerpt": "About Our Company: Headquartered in Denver, Colorado, Cologix is a leading North America network-neutral interconnection and hyperscale edge data center company. Our platform gives customers access to 45+ digital edge and Scalelogix℠ hyperscale edge data centers in 13 markets across the United States and Canada along with a carrier-dense ecosystem of 710+ networks, 360+ cloud&hellip;",
+   "jobDescription": "<p><b>About Our Company:</b></p>\n<p>Headquartered in Denver, Colorado, Cologix is a leading North America network-neutral interconnection and hyperscale edge data center company. Our platform gives customers access to 45+ digital edge and Scalelogix℠ hyperscale edge data centers in 13 markets across the United States and Canada along with a carrier-dense ecosystem of 710+ networks, 360+ cloud providers, 35+ onramps and seven Internet exchanges. We provide our nearly 2,000 customers with direct access to our local operations teams, resulting in strong partnerships enabled by exceptional operati",
+   "pubDate": "2026-10-20T19:20:11+00:00",
+   "salaryMin": 100000,
+   "salaryMax": 130000,
+   "salaryCurrency": "USD",
+   "salaryPeriod": "yearly"
+  },
+  {
+   "id": 156044,
+   "url": "https://jobicy.com/jobs/156044-director-gtm-strategy-planning-analytics",
+   "jobSlug": "156044-director-gtm-strategy-planning-analytics",
+   "jobTitle": "Director, GTM Strategy, Planning & Analytics",
+   "companyName": "Articulate",
+   "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2021/02/Jobicy-210227081612-062363.jpg",
+   "jobIndustry": [
+    "Product & Operations"
+   ],
+   "jobType": [
+    "Full-Time"
+   ],
+   "jobGeo": "USA",
+   "jobLevel": "Director",
+   "jobExcerpt": "Articulate is seeking a Director of GTM Strategy, Planning &amp; Analytics to lead and evolve how we translate company strategy into actionable go-to-market plans, measure business performance, govern the data foundations that support decision-making, and align compensation programs to GTM priorities across Marketing, Sales, Customer Success, and Channel. This role leads an integrated function spanning&hellip;",
+   "jobDescription": "<p><a href=\"https://jobicy.com/company/articulate\" target=\"_blank\" rel=\"noopener\">Articulate</a> is seeking a Director of GTM Strategy, Planning &amp; Analytics to lead and evolve how we translate company strategy into actionable go-to-market plans, measure business performance, govern the data foundations that support decision-making, and align compensation programs to GTM priorities across Marketing, Sales, Customer Success, and Channel.</p>\n<p>This role leads an integrated function spanning GTM strategy and planning, forecasting and performance management, analytics and insights, GTM data s",
+   "pubDate": "2026-10-20T19:01:17+00:00",
+   "salaryMin": 163900,
+   "salaryMax": 245900,
+   "salaryCurrency": "USD",
+   "salaryPeriod": "yearly"
+  },
+  {
+   "id": 153641,
+   "url": "https://jobicy.com/jobs/153641-engineering-manager-platform-application-excellence",
+   "jobSlug": "153641-engineering-manager-platform-application-excellence",
+   "jobTitle": "Engineering Manager (Platform - Application Excellence)",
+   "companyName": "Paddle",
+   "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2025/08/28ca3645-221.png",
+   "jobIndustry": [
+    "Software Engineering"
+   ],
+   "jobType": [
+    "Full-Time"
+   ],
+   "jobGeo": "Ireland,  Portugal,  UK",
+   "jobLevel": "Director",
+   "jobExcerpt": "What do we do? Paddle offers digital product companies a completely different approach to their payment infrastructure. Instead of assembling and maintaining a complex stack of payments-related apps and services, we’re a Merchant of Record for our customers. That means we take away 100% of the pain of payment fragmentation. It’s faster, safer, cheaper, and,&hellip;",
+   "jobDescription": "<h3>What do we do?</h3>\n<p><a href=\"https://jobicy.com/company/paddle\" target=\"_blank\" rel=\"noopener\">Paddle</a> offers digital product companies a completely different approach to their payment infrastructure. Instead of assembling and maintaining a complex stack of payments-related apps and services, we’re a Merchant of Record for our customers. That means we take away 100% of the pain of payment fragmentation. It’s faster, safer, cheaper, and, above all, way better.</p>\n<p>We’re backed by investors including KKR, FTV Capital, Kindred, Notion, and 83North and serve over 5000 software sellers",
+   "pubDate": "2026-10-20T03:25:15+00:00"
+  }
+ ],
+ "statusCode": 200,
+ "success": true
+}

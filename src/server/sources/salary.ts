@@ -1,6 +1,6 @@
 const fmt = (n: number) => new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(n);
 const SYMBOL: Record<string, string> = { USD: "US$", EUR: "€", BRL: "R$", GBP: "£" };
-const PERIOD: Record<string, string> = { annual: "ano", year: "ano", monthly: "mês", month: "mês", hourly: "hora" };
+const PERIOD: Record<string, string> = { annual: "ano", year: "ano", yearly: "ano", monthly: "mês", month: "mês", hourly: "hora" };
 
 /** Faixa salarial legível; null quando a fonte não informa (0 conta como não informado). */
 export function formatSalaryRange(

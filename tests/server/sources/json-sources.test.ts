@@ -64,14 +64,19 @@ describe("arbeitnow", () => {
 });
 
 describe("registry", () => {
-  it("has 7 sources; defaults enabled: gupy, programathor, remotive, remoteok, himalayas", () => {
-    expect(SOURCES).toHaveLength(7);
+  it("has 12 sources; LinkedIn and Arbeitnow off by default", () => {
+    expect(SOURCES).toHaveLength(12);
     expect(SOURCES.filter((s) => s.defaultEnabled).map((s) => s.id)).toEqual([
       "gupy",
       "programathor",
+      "vagascom",
+      "infojobs",
       "remotive",
       "remoteok",
       "himalayas",
+      "weworkremotely",
+      "workingnomads",
+      "jobicy",
     ]);
   });
 });

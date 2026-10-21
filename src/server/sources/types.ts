@@ -1,6 +1,18 @@
 import type { Http } from "./http";
 
-export type SourceId = "gupy" | "programathor" | "remotive" | "remoteok" | "himalayas" | "arbeitnow" | "linkedin";
+export type SourceId =
+  | "gupy"
+  | "programathor"
+  | "vagascom"
+  | "infojobs"
+  | "remotive"
+  | "remoteok"
+  | "himalayas"
+  | "weworkremotely"
+  | "workingnomads"
+  | "jobicy"
+  | "arbeitnow"
+  | "linkedin";
 
 export type SearchQuery = { keywords: string; location: string | null };
 
