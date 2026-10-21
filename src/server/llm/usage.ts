@@ -31,7 +31,7 @@ export function callsToday(db: Db, now: number): number {
   return (db.$client.prepare("select count(*) c from llm_usage where at >= ?").get(startOfDay(now)) as { c: number }).c;
 }
 
-export function usageThisMonth(db: Db, now: number): { calls: number; inputTokens: number; outputTokens: number } {
+export function usageThisMonth(db: Db, now: number = Date.now()): { calls: number; inputTokens: number; outputTokens: number } {
   const row = db.$client
     .prepare(
       "select count(*) calls, coalesce(sum(input_tokens),0) inputTokens, coalesce(sum(output_tokens),0) outputTokens from llm_usage where at >= ?",
