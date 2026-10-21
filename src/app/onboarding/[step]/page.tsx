@@ -22,6 +22,7 @@ export default async function OnboardingStepPage({ params }: { params: Promise<{
       completed={getSetting(db, "onboarding.completedSteps")}
       privacyAccepted={getSetting(db, "bridge.privacyAcceptedAt") !== null}
       needsBridge={getSetting(db, "llm.provider") === "claude-code"}
+      lastImport={getSetting(db, "onboarding.lastImport")}
     />
   );
 }

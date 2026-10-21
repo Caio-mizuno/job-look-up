@@ -12,7 +12,9 @@ export type SourceId =
   | "workingnomads"
   | "jobicy"
   | "arbeitnow"
-  | "linkedin";
+  | "linkedin"
+  | "indeed"
+  | "glassdoor";
 
 export type SearchQuery = { keywords: string; location: string | null };
 
@@ -30,6 +32,14 @@ export type RawJob = {
   descriptionText: string | null;
 };
 
+/** Chrome de verdade no computador da pessoa, via ajudante: para sites que barram requisições simples. */
+export interface PageBrowser {
+  /** HTML da página já renderizada; `waitFor` é o seletor que indica que o conteúdo chegou. */
+  getHtml(url: string, opts: { waitFor: string }): Promise<string>;
+}
+
+export type SourceContext = { browser: PageBrowser };
+
 export interface JobSource {
   id: SourceId;
   label: string;
@@ -39,6 +49,6 @@ export interface JobSource {
   maxPages: number;
   cacheTtlMs?: number;
   userAgent?: string;
-  search(q: SearchQuery, page: number, http: Http): Promise<RawJob[]>;
-  fetchDetail?(url: string, http: Http): Promise<string | null>;
+  search(q: SearchQuery, page: number, http: Http, ctx?: SourceContext): Promise<RawJob[]>;
+  fetchDetail?(url: string, http: Http, ctx?: SourceContext): Promise<string | null>;
 }

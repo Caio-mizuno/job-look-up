@@ -1,6 +1,8 @@
 import { arbeitnowSource } from "./arbeitnow";
+import { glassdoorSource } from "./glassdoor";
 import { gupySource } from "./gupy";
 import { himalayasSource } from "./himalayas";
+import { indeedSource } from "./indeed";
 import { infojobsSource } from "./infojobs";
 import { jobicySource } from "./jobicy";
 import { linkedinSource } from "./linkedin";
@@ -26,6 +28,8 @@ export const SOURCES: JobSource[] = [
   jobicySource,
   arbeitnowSource,
   linkedinSource,
+  indeedSource,
+  glassdoorSource,
 ];
 
 export function getSource(id: SourceId | string): JobSource | undefined {

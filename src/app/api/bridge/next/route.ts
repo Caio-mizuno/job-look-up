@@ -4,7 +4,7 @@ import { onClaim } from "@/server/bridge/lifecycle";
 import { touchBridge } from "@/server/bridge/presence";
 import { claimNext, type TaskType } from "@/server/tasks/queue";
 
-const BRIDGE_TYPES = new Set<TaskType>(["llm_call", "apply"]);
+const BRIDGE_TYPES = new Set<TaskType>(["llm_call", "apply", "browser_fetch"]);
 
 export async function GET(req: Request): Promise<Response> {
   if (!verifyBridgeAuth(req)) return new Response(null, { status: 401 });

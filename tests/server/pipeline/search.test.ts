@@ -105,6 +105,34 @@ describe("queries", () => {
   });
 });
 
+describe("link queries", () => {
+  it("saveQueries drops links and e-mails", () => {
+    const db = memDb();
+    saveQueries(db, [{ keywords: "https://www.linkedin.com/in/caio-mizuno/", location: null }, { keywords: "laravel", location: null }], NOW);
+    expect(listQueries(db).map((q) => q.keywords)).toEqual(["laravel"]);
+  });
+
+  it("runSearch ignores a link saved before validation and searches the profile instead", async () => {
+    const db = memDb();
+    saveProfile(db, sampleProfile(), NOW);
+    db.$client
+      .prepare("insert into search_queries (keywords, location, origin, enabled, created_at) values (?, null, 'user', 1, ?)")
+      .run("https://www.linkedin.com/in/caio-mizuno/", NOW);
+    const seen: string[] = [];
+    const src = fakeSource("gupy", () => [], {
+      maxPages: 1,
+      async search(q) {
+        seen.push(q.keywords);
+        return [];
+      },
+    });
+    const runId = startSearchRun(db, "manual", NOW);
+    await runSearch(db, { runId, http: createHttp(), now: () => NOW, sources: [src] });
+    expect(seen.length).toBeGreaterThan(0);
+    expect(seen.some((k) => /linkedin|https?:/.test(k))).toBe(false);
+  });
+});
+
 describe("runSearch", () => {
   it("ok + limited sources, dedup, perSource counts, enrich batches", async () => {
     const db = memDb();
@@ -164,6 +192,23 @@ describe("runSearch", () => {
     const runId = startSearchRun(db, "manual", NOW);
     await runSearch(db, { runId, http: createHttp(), now: () => NOW, sources: [src] });
     expect((db.$client.prepare("select description_text d from jobs").get() as { d: string }).d).toContain("Descrição completa");
+  });
+
+  it("hands the bridge browser to sources for search and detail", async () => {
+    const db = memDb();
+    saveProfile(db, sampleProfile(), NOW);
+    const browser = { getHtml: async (url: string) => `<p>${url}</p>` };
+    const src = fakeSource("indeed", () => [], {
+      maxPages: 1,
+      async search(_q, _page, _http, ctx) {
+        const html = await ctx!.browser.getHtml("https://br.indeed.com/jobs?q=x", { waitFor: "[data-jk]" });
+        return [rawJob("indeed", 1, { descriptionText: html })];
+      },
+      fetchDetail: async (url, _http, ctx) => `Descrição via ${await ctx!.browser.getHtml(url, { waitFor: "body" })}`,
+    });
+    const runId = startSearchRun(db, "manual", NOW);
+    await runSearch(db, { runId, http: createHttp(), browser, now: () => NOW, sources: [src] });
+    expect((db.$client.prepare("select description_text d from jobs").get() as { d: string }).d).toMatch(/^Descrição via <p>/);
   });
 
   it("startSearchRun reuses running run", () => {

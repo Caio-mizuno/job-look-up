@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isUsableKeywords } from "@/lib/search-keywords";
 import type { Db } from "@/server/db/client";
 import { generateObject } from "@/server/llm/index";
 import { GENERATE_QUERIES_SYSTEM } from "@/server/llm/prompts";
@@ -23,7 +24,7 @@ function dedupe(queries: SearchQuery[]): SearchQuery[] {
   for (const q of queries) {
     const keywords = q.keywords.replace(/\s+/g, " ").trim();
     const key = `${keywords.toLowerCase()}|${(q.location ?? "").toLowerCase()}`;
-    if (!keywords || seen.has(key)) continue;
+    if (!keywords || !isUsableKeywords(keywords) || seen.has(key)) continue;
     seen.add(key);
     out.push({ keywords, location: q.location?.trim() || null });
   }
@@ -82,7 +83,7 @@ function profileForPrompt(p: Profile): string {
 export const generateQueriesHandler: Handler = async (_task, { db, now }) => {
   const profile = getProfile(db)?.data;
   if (!profile) return { skipped: "sem perfil" };
-  const hasUserQueries = listQueries(db).some((q) => q.origin === "user");
+  const hasUserQueries = listQueries(db).some((q) => q.origin === "user" && isUsableKeywords(q.keywords));
   let fallback = false;
 
   if (!hasUserQueries) {

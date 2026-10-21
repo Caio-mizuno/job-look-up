@@ -1,16 +1,19 @@
 #!/usr/bin/env node
-// Ajudante do job-look-up: roda no host, busca tarefas no app e executa o Claude Code.
+// Ajudante do job-look-up: roda no host, busca tarefas no app e executa o Claude Code e o Chrome.
 import { execFile } from "node:child_process";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { AuthError, createAppClient } from "./http.mjs";
 import { runApply } from "./apply.mjs";
+import { createBrowserRunner } from "./browser.mjs";
 import { runLlmCall } from "./llm.mjs";
 
 const POLL_MS = 2000;
 const EVENTS_FLUSH_MS = 1000;
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
+
+const browser = createBrowserRunner({ profileDir: join(ROOT, "data", "chrome-profile") });
 
 /** Executores por tipo de tarefa e quantas rodam ao mesmo tempo. */
 const EXECUTORS = {
@@ -35,6 +38,8 @@ const EXECUTORS = {
       }
     },
   },
+  // Uma página por vez, no mesmo Chrome: poucas requisições por site.
+  browser_fetch: { slots: 1, run: (payload) => browser.run(payload) },
 };
 
 const log = (msg) => console.log(`[bridge] ${msg}`);
@@ -129,6 +134,7 @@ export async function main() {
     stopped = true;
     log(`${signal}: esperando ${inFlight.size} tarefa(s) em andamento…`);
     await Promise.allSettled([...inFlight]);
+    await browser.close();
     process.exit(0);
   };
   process.on("SIGINT", () => void shutdown("SIGINT"));

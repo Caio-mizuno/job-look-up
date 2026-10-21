@@ -3,19 +3,23 @@ SHELL := /bin/bash
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
 
-.PHONY: setup up down logs bridge
+.PHONY: setup up down logs bridge bridge-deps
 
 setup:
 	@node scripts/setup-env.mjs
 	@mkdir -p data
 
-up: setup
+up: setup bridge-deps
 	docker compose up -d --build
 	@echo "App em http://127.0.0.1:3000 — iniciando o ajudante (Ctrl+C para parar)"
 	node bridge/index.mjs
 
-bridge:
+bridge: bridge-deps
 	node bridge/index.mjs
+
+# Única dependência do ajudante: playwright-core, para abrir Indeed e Glassdoor no Chrome instalado.
+bridge-deps:
+	@test -d bridge/node_modules/playwright-core || npm --prefix bridge ci --no-audit --no-fund
 
 down:
 	docker compose down

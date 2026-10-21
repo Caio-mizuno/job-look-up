@@ -171,7 +171,7 @@ export function StepExperiences({ profile, onChange }: StepProps) {
               onClick={async () => {
                 const fd = new FormData();
                 fd.set("text", pasted);
-                if (await run(fd)) {
+                if ((await run(fd)).ok) {
                   setPasted("");
                   setPasteOpen(false);
                 }

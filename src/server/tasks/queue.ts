@@ -10,7 +10,8 @@ export type TaskType =
   | "draft_answers"
   | "prepare_apply"
   | "llm_call"
-  | "apply";
+  | "apply"
+  | "browser_fetch";
 
 export type Task = {
   id: number;

@@ -1,11 +1,13 @@
 import pLimit from "p-limit";
+import { isUsableKeywords } from "@/lib/search-keywords";
 import type { Db } from "@/server/db/client";
 import { setJobDescription, upsertJob } from "@/server/jobs/repo";
 import { getProfile } from "@/server/profile/repo";
 import { getSetting } from "@/server/settings";
+import { createBridgeBrowser } from "@/server/sources/browser";
 import { createHttp, RateLimitedError, type Http } from "@/server/sources/http";
 import { enabledSources, updateSourceStatus } from "@/server/sources/settings";
-import type { JobSource, SearchQuery } from "@/server/sources/types";
+import type { JobSource, PageBrowser, SearchQuery, SourceContext } from "@/server/sources/types";
 import type { Handler } from "@/server/tasks/handlers";
 import { enqueue } from "@/server/tasks/queue";
 import type { SourceRunStatus } from "@/server/status";
@@ -49,6 +51,7 @@ async function searchSource(
   source: JobSource,
   queries: SearchQuery[],
   http: Http,
+  ctx: SourceContext,
   now: () => number,
 ): Promise<void> {
   patchRunSource(db, runId, source.id, { status: "running", count: 0 });
@@ -62,7 +65,7 @@ async function searchSource(
       limit(async () => {
         for (let page = 1; page <= source.maxPages && !limited; page++) {
           try {
-            const raws = await source.search(q, page, http);
+            const raws = await source.search(q, page, http, ctx);
             for (const raw of raws) {
               const job = normalizeRawJob(raw, now());
               upsertJob(db, job, now());
@@ -107,20 +110,22 @@ type CandidateRow = {
 
 export async function runSearch(
   db: Db,
-  opts: { runId: number; http?: Http; now?: () => number; sources?: JobSource[] },
+  opts: { runId: number; http?: Http; browser?: PageBrowser; now?: () => number; sources?: JobSource[] },
 ): Promise<void> {
   const now = opts.now ?? Date.now;
   const http = opts.http ?? getSharedHttp();
+  const ctx: SourceContext = { browser: opts.browser ?? createBridgeBrowser(db, now) };
   const run = db.$client.prepare("select started_at from search_runs where id = ?").get(opts.runId) as
     | { started_at: number }
     | undefined;
   if (!run) return;
   const profile = getProfile(db);
   const sources = opts.sources ?? enabledSources(db);
-  const saved = listQueries(db);
+  // Consulta salva antes da validação (ex.: um link) não vai para os sites.
+  const saved = listQueries(db).filter((q) => isUsableKeywords(q.keywords));
   const queries = saved.length > 0 ? saved : profile ? fallbackQueries(profile.data) : [];
 
-  await Promise.all(sources.map((s) => searchSource(db, opts.runId, s, queries, http, now)));
+  await Promise.all(sources.map((s) => searchSource(db, opts.runId, s, queries, http, ctx, now)));
 
   if (profile) {
     const candidates = (
@@ -154,7 +159,7 @@ export async function runSearch(
           detailLimit.set(j.source, limiter);
           return limiter(async () => {
             try {
-              const text = await bySource.get(j.source)!.fetchDetail!(j.url, http);
+              const text = await bySource.get(j.source)!.fetchDetail!(j.url, http, ctx);
               if (text) setJobDescription(db, j.id, text);
             } catch {
               // Sem detalhe a vaga segue com o que a listagem trouxe.

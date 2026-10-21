@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Profile } from "@/server/profile/schema";
+import type { LastImport } from "@/server/settings";
 import { sectionOf, type SectionStep } from "@/server/profile/sections";
 import { StepImport } from "./step-import";
 import { nextStep, prevStep, STEPS, type StepIndex } from "./steps";
@@ -30,12 +31,14 @@ export function Wizard({
   completed,
   privacyAccepted,
   needsBridge,
+  lastImport,
 }: {
   step: StepIndex;
   initialProfile: Profile;
   completed: number[];
   privacyAccepted: boolean;
   needsBridge: boolean;
+  lastImport: LastImport | null;
 }) {
   const router = useRouter();
   const [profile, setProfile] = useState(initialProfile);
@@ -97,7 +100,14 @@ export function Wizard({
       case 0:
         return <BridgeSetup privacyAccepted={privacyAccepted} />;
       case 1:
-        return <StepImport {...props} needsBridge={needsBridge} />;
+        return (
+          <StepImport
+            {...props}
+            needsBridge={needsBridge}
+            lastImport={lastImport}
+            onReview={() => void go(nextStep(step), true)}
+          />
+        );
       case 2:
         return <StepPersonal {...props} />;
       case 3:

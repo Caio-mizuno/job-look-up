@@ -8,7 +8,7 @@ import { isSearchReady, type ReadinessGap } from "@/server/profile/readiness";
 import { getProfile, saveProfile } from "@/server/profile/repo";
 import { emptyProfile, type Profile } from "@/server/profile/schema";
 import { applySection, SECTION_SCHEMAS, type SectionStep } from "@/server/profile/sections";
-import { getSetting, setSetting } from "@/server/settings";
+import { getSetting, setSetting, type LastImport } from "@/server/settings";
 import { enqueue } from "@/server/tasks/queue";
 
 const MIN_TEXT = 50;
@@ -59,6 +59,14 @@ export async function startImport(form: FormData): Promise<{ taskId: number } | 
     throw err;
   }
   return { taskId: enqueue(getDb(), { type: "extract_profile", payload: { text } }) };
+}
+
+/** Chamada quando a IA termina de preencher o perfil: conclui a etapa de importação. */
+export async function recordImport(source: string): Promise<LastImport> {
+  const last = { source: source.slice(0, 200), at: Date.now() };
+  setSetting(getDb(), "onboarding.lastImport", last);
+  markCompleted(1);
+  return last;
 }
 
 export async function uploadCv(form: FormData): Promise<{ ok: true } | { ok: false; error: "not_pdf" | "too_large" }> {

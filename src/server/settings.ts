@@ -6,6 +6,8 @@ import { getEnv } from "@/server/env";
 
 export type LlmProviderId = "claude-code" | "anthropic" | "openai-compatible";
 export type OpenAiCompatibleConfig = { baseUrl: string; model: string; apiKey: string };
+/** Última importação de currículo que deu certo: a etapa mostra de onde o perfil veio. */
+export type LastImport = { source: string; at: number };
 
 type Def<T> = { default: T; secret: boolean };
 const def = <T>(value: T, secret = false): Def<T> => ({ default: value, secret });
@@ -21,6 +23,7 @@ export const SETTINGS = {
   "bridge.lastSeenAt": def<number>(0),
   "bridge.privacyAcceptedAt": def<number | null>(null),
   "onboarding.completedSteps": def<number[]>([]),
+  "onboarding.lastImport": def<LastImport | null>(null),
 };
 
 export type SettingKey = keyof typeof SETTINGS;

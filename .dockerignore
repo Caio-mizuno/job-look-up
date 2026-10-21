@@ -12,3 +12,4 @@ tests
 bridge
 *.tsbuildinfo
 .DS_Store
+scripts

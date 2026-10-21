@@ -18,9 +18,10 @@ Busca vagas de emprego com base no **seu** perfil, dá uma nota de match para ca
 └──────────────▲─────────────────────────────────────────────────────┘
                │ HTTP localhost:3000 + token (o ajudante faz polling)
 ┌──────────────┴──────── Seu computador ─────────────────────────────┐
-│  ajudante (bridge/, Node sem dependências)                          │
+│  ajudante (bridge/, Node + playwright-core)                         │
 │   • análise:     claude -p --json-schema …  (sua assinatura)        │
 │   • candidatura: claude -p --chrome …  → Claude in Chrome → Chrome  │
+│   • Indeed/Glassdoor: busca num Chrome separado (playwright-core)   │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -35,6 +36,7 @@ Busca vagas de emprego com base no **seu** perfil, dá uma nota de match para ca
 - Node **20.12+** no computador, só para o ajudante.
 - [Claude Code](https://claude.com/claude-code) instalado e logado.
 - Google Chrome com a extensão **Claude in Chrome** ativa (só para a candidatura automática).
+- Google Chrome também para Indeed e Glassdoor, se ligar essas fontes (sem extensão, com um perfil separado do seu).
 
 Testado em macOS. Linux deve funcionar; no Windows, use WSL2 (não testado).
 
@@ -50,7 +52,7 @@ Abra **http://127.0.0.1:3000** e siga o onboarding.
 | Comando | O que faz |
 |---|---|
 | `make up` | `make setup` + `docker compose up -d --build` + ajudante em primeiro plano |
-| `make bridge` | só o ajudante (se o Docker já estiver de pé) |
+| `make bridge` | só o ajudante (se o Docker já estiver de pé); na primeira vez instala o `playwright-core` dele |
 | `make down` | para os containers |
 | `make logs` | logs do app e do worker |
 
@@ -89,21 +91,23 @@ Se pedir login, ele para e avisa.
 | Remotive, Remote OK, Himalayas, We Work Remotely, Working Nomads, Jobicy | remoto internacional | ligadas |
 | Arbeitnow | Europa | desligada |
 | LinkedIn (endpoint público, **nunca usa seu login**) | global | desligada; pode ser bloqueada |
+| Indeed, Glassdoor (pelo ajudante, num Chrome separado do seu) | Brasil | desligadas; podem ser bloqueadas |
+
+**Indeed e Glassdoor** recusam qualquer cliente que não seja navegador (desafio do Cloudflare). O ajudante abre a busca no Google Chrome instalado, com um perfil só do app (sem o seu login), minimizado (a janela só pisca ao abrir) e uma página por vez. Se o site pedir verificação, a fonte para e aparece como "limitada": o app não resolve captcha nem disfarça o navegador. Do Glassdoor vem só o resumo de cada vaga, porque a página de detalhes sempre pede verificação. Raspar esses sites vai contra os termos de uso deles, por isso as duas vêm desligadas.
 
 **Ficaram de fora:**
-- **Indeed e Glassdoor** respondem 403 a qualquer cliente que não seja navegador. O app não contorna bloqueios.
 - **NetVagas, Remotar, Catho, Trampos e Coodesh** só montam a lista de vagas via JavaScript.
 
 Regras de boa convivência:
 - poucas requisições por busca, com cache de 6 h nas APIs que pedem isso;
 - crédito e link para a fonte em todo card, como pedem Remotive, Remote OK e Jobicy;
-- nada de login nem de contornar bloqueios.
+- nada de login, captcha resolvido ou navegador disfarçado: se o site bloquear, a fonte para.
 
 Ligue e desligue as fontes em **Configuração → Fontes de vaga**.
 
 ### Adicionar uma fonte
 
-Implemente `JobSource` (`src/server/sources/types.ts`): `search(query, page, http)` devolve `RawJob[]`, e `fetchDetail` é opcional. Registre em `src/server/sources/registry.ts` e escreva um teste com uma fixture real em `tests/fixtures/sources/`. Para olhar uma fonte ao vivo: `npx tsx scripts/probe-source.ts <id> "<palavras>"`.
+Implemente `JobSource` (`src/server/sources/types.ts`): `search(query, page, http, ctx)` devolve `RawJob[]`, e `fetchDetail` é opcional. Site que recusa requisições simples usa `ctx.browser.getHtml(url, { waitFor })`, que abre a página no Chrome pelo ajudante; libere o domínio em `bridge/browser.mjs`. Registre em `src/server/sources/registry.ts` e escreva um teste com uma fixture real em `tests/fixtures/sources/`. Para olhar uma fonte ao vivo: `npx tsx scripts/probe-source.ts <id> "<palavras>"`.
 
 ## Problemas comuns
 
@@ -113,7 +117,9 @@ Implemente `JobSource` (`src/server/sources/types.ts`): `search(query, page, htt
 | `BRIDGE_TOKEN não confere com o .env do app` | rode `make setup` e reinicie o Docker (`make down && make up`) |
 | Vagas "aguardando análise" | o ajudante está desligado; a fila anda sozinha quando ele volta |
 | "Teto diário de IA atingido" | ajuste o teto em **Configuração → IA** (0 = sem teto) |
-| Fonte "limitada" | o site respondeu 429; a próxima busca tenta de novo |
+| Fonte "limitada" | o site respondeu 429 ou pediu verificação anti-robô; a próxima busca tenta de novo |
+| Indeed/Glassdoor: `falta o playwright-core no ajudante` | rode `make bridge` (ou `npm --prefix bridge install`) |
+| Indeed/Glassdoor: `não consegui abrir o Google Chrome` | instale o Google Chrome |
 | A extensão pede permissão para um site | aprove no Chrome; o ajudante espera até 10 min |
 | Limite do plano do Claude | a análise usa a mesma cota do Claude Code; diminua a busca automática ou defina um teto |
 
@@ -126,13 +132,13 @@ npm run quality        # eslint + tsc + vitest (portão obrigatório)
 npm run worker:build   # bundle do worker
 ```
 
-A stack inclui Next.js 16, React 19, Tailwind v4, shadcn/ui, SQLite (better-sqlite3 + Drizzle), zod, cheerio e vitest. O ajudante (`bridge/`) é Node puro, sem dependências.
+A stack inclui Next.js 16, React 19, Tailwind v4, shadcn/ui, SQLite (better-sqlite3 + Drizzle), zod, cheerio e vitest. O ajudante (`bridge/`) é Node puro; a única dependência é o `playwright-core`, para Indeed e Glassdoor.
 
 ## English
 
 **job-look-up** is a local-first, open-source job finder.
 1. You build a profile in an onboarding wizard; importing a PDF or text works.
-2. It searches several job boards in parallel: Brazilian boards plus remote-first international ones.
+2. It searches several job boards in parallel: Brazilian boards plus remote-first international ones. Indeed and Glassdoor are opt-in: the helper opens them in a separate Chrome profile and stops if the site asks for a captcha.
 3. Claude (through your own Claude Code subscription, via a small host helper) scores each job against your profile and summarizes it.
 4. On "apply", Claude in Chrome fills the application in **your** Chrome and **stops before submitting**.
 

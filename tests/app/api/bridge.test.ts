@@ -58,6 +58,12 @@ describe("GET /api/bridge/next", () => {
     expect(await res.json()).toEqual({ id: llm, type: "llm_call", payload: { model: "haiku" } });
     expect((await next(nextReq("llm_call"))).status).toBe(204);
   });
+
+  it("hands browser_fetch tasks to the bridge", async () => {
+    const id = enqueue(db, { type: "browser_fetch", runner: "bridge", payload: { url: "https://br.indeed.com/jobs?q=x", waitFor: "[data-jk]" }, runAt: 0 });
+    const res = await next(nextReq("browser_fetch"));
+    expect(await res.json()).toEqual({ id, type: "browser_fetch", payload: { url: "https://br.indeed.com/jobs?q=x", waitFor: "[data-jk]" } });
+  });
 });
 
 describe("POST /api/bridge/tasks/:id/result", () => {
@@ -84,6 +90,13 @@ describe("POST /api/bridge/tasks/:id/result", () => {
     claimNext(db, { runner: "bridge" });
     await resultReq(id, { ok: false, error: "limite de novo" });
     expect(getTask(db, id)).toMatchObject({ status: "failed", error: "limite de novo" });
+  });
+
+  it("browser_fetch error fails at once (no automatic retry)", async () => {
+    const id = enqueue(db, { type: "browser_fetch", runner: "bridge", payload: { url: "https://br.indeed.com/jobs?q=x" }, runAt: 0 });
+    claimNext(db, { runner: "bridge", types: ["browser_fetch"] });
+    await resultReq(id, { ok: false, error: "não consegui abrir o Google Chrome" });
+    expect(getTask(db, id)).toMatchObject({ status: "failed", error: "não consegui abrir o Google Chrome" });
   });
 
   it("404 for unknown or not running task", async () => {

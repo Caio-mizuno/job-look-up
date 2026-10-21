@@ -1,0 +1,11 @@
+{
+  "name": "job-look-up-bridge",
+  "private": true,
+  "description": "Ajudante do job-look-up. playwright-core abre Indeed e Glassdoor no Google Chrome instalado.",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "playwright-core": "1.63.0"
+  }
+}
