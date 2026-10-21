@@ -1,8 +1,9 @@
-export default function Home() {
-  return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-2 p-6">
-      <h1 className="text-xl font-semibold">job-look-up</h1>
-      <p className="text-muted-foreground text-sm">Em construção.</p>
-    </main>
-  );
+import { redirect } from "next/navigation";
+import { pageDb } from "@/server/page-db";
+import { isSearchReady } from "@/server/profile/readiness";
+import { getProfile } from "@/server/profile/repo";
+
+export default async function Home() {
+  const profile = getProfile(await pageDb());
+  redirect(profile && isSearchReady(profile.data).ready ? "/vagas" : "/onboarding/0");
 }
