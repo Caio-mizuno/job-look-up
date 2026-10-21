@@ -10,7 +10,12 @@ export const ApplyReportSchema = z.object({
 });
 export type ApplyReport = z.infer<typeof ApplyReportSchema>;
 
-export const DraftsSchema = z.object({ pitch: z.string().max(600), whyCompany: z.string().max(600) });
+export const DraftsSchema = z.object({
+  pitch: z.string().max(600),
+  whyCompany: z.string().max(600),
+  /** Mensagem amigável para a empresa/recrutador (campo "mensagem", "carta", "comentários"). */
+  message: z.string().max(1200),
+});
 export type Drafts = z.infer<typeof DraftsSchema>;
 
 export const ApplyEventSchema = z.object({

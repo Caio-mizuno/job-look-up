@@ -1,5 +1,6 @@
 "use server";
 
+import { buildCompanyMessage } from "@/server/applications/message";
 import { createApplication, getApplication, retryApplication } from "@/server/applications/repo";
 import { getDb } from "@/server/db/client";
 import { setJobStatus } from "@/server/jobs/list";
@@ -51,12 +52,16 @@ export type KitData = {
   jobUrl: string;
   fields: { label: string; value: string }[];
   answers: { question: string; answer: string }[];
-  drafts: { pitch: string; whyCompany: string } | null;
+  drafts: { pitch: string; whyCompany: string; message?: string } | null;
+  /** Mensagem genérica (sem IA), usada quando ainda não há uma gerada. */
+  message: string;
 };
 
 export async function getKitData(jobId: number): Promise<KitData | null> {
   const db = getDb();
-  const job = db.$client.prepare("select title, url from jobs where id = ?").get(jobId) as { title: string; url: string } | undefined;
+  const job = db.$client.prepare("select title, url, company from jobs where id = ?").get(jobId) as
+    | { title: string; url: string; company: string | null }
+    | undefined;
   if (!job) return null;
   const p = getProfile(db)?.data;
   const d = db.$client
@@ -84,5 +89,13 @@ export async function getKitData(jobId: number): Promise<KitData | null> {
     fields,
     answers: (p?.readyAnswers ?? []).filter((a) => a.answer.trim()),
     drafts: d ? JSON.parse(d.drafts) : null,
+    message: buildCompanyMessage({
+      name: p?.personal.name ?? "",
+      headline: p?.headline ?? "",
+      skills: p?.skills.map((s) => s.name) ?? [],
+      jobTitle: job.title,
+      company: job.company,
+      linkedin: p?.personal.linkedin ?? "",
+    }),
   };
 }

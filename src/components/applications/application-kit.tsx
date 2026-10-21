@@ -40,9 +40,18 @@ export function CopyField({ label, value }: { label: string; value: string }) {
   );
 }
 
+export function CompanyMessage({ message, hint }: { message: string; hint?: string }) {
+  return (
+    <section className="bg-muted/50 rounded-lg px-3 py-1">
+      <CopyField label={C.message} value={message} />
+      {hint && <p className="text-muted-foreground pb-2 text-xs">{hint}</p>}
+    </section>
+  );
+}
+
 export function ApplicationKit({ jobId, open, onOpenChange }: { jobId: number | null; open: boolean; onOpenChange: (v: boolean) => void }) {
   const [data, setData] = useState<KitData | null>(null);
-  const [drafts, setDrafts] = useState<{ pitch: string; whyCompany: string } | null>(null);
+  const [drafts, setDrafts] = useState<{ pitch: string; whyCompany: string; message?: string } | null>(null);
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -65,8 +74,9 @@ export function ApplicationKit({ jobId, open, onOpenChange }: { jobId: number | 
     try {
       const { taskId } = await generateDrafts(jobId);
       const task = await waitTask(taskId, { timeoutMs: 120_000 });
-      const result = task.result as { pitch?: string; whyCompany?: string; deferred?: boolean } | null;
-      if (task.status === "done" && result?.pitch !== undefined) setDrafts({ pitch: result.pitch ?? "", whyCompany: result.whyCompany ?? "" });
+      const result = task.result as { pitch?: string; whyCompany?: string; message?: string; deferred?: boolean } | null;
+      if (task.status === "done" && result?.pitch !== undefined)
+        setDrafts({ pitch: result.pitch ?? "", whyCompany: result.whyCompany ?? "", message: result.message });
       else toast.error(result?.deferred ? "Ajudante desligado: rode make bridge." : `A IA falhou: ${task.error}`);
     } finally {
       setGenerating(false);
@@ -92,6 +102,10 @@ export function ApplicationKit({ jobId, open, onOpenChange }: { jobId: number | 
                 </a>
               </Button>
             )}
+            <CompanyMessage
+              message={drafts?.message?.trim() ? drafts.message : data.message}
+              hint={drafts?.message?.trim() ? undefined : C.messageHint}
+            />
             <section>
               <h3 className="mb-1 text-sm font-medium">{C.personal}</h3>
               <div className="divide-y">

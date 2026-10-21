@@ -3,10 +3,20 @@ import { basename } from "node:path";
 import type { Db } from "@/server/db/client";
 import { getProfile } from "@/server/profile/repo";
 import { emptyProfile } from "@/server/profile/schema";
+import { buildCompanyMessage } from "./message";
 import { getApplication } from "./repo";
 import type { ApplyPayload, Drafts } from "./schema";
 
 export { isAutoApplyAllowed } from "@/lib/apply-url";
+
+/** Rascunhos da IA quando existem; sem mensagem da IA, entra a mensagem genérica. */
+function withMessage(drafts: Partial<Drafts> | null, msg: Parameters<typeof buildCompanyMessage>[0]): Drafts {
+  return {
+    pitch: drafts?.pitch ?? "",
+    whyCompany: drafts?.whyCompany ?? "",
+    message: drafts?.message?.trim() ? drafts.message : buildCompanyMessage(msg),
+  };
+}
 
 export function buildApplyPayload(db: Db, applicationId: number): ApplyPayload {
   const app = getApplication(db, applicationId);
@@ -42,7 +52,14 @@ export function buildApplyPayload(db: Db, applicationId: number): ApplyPayload {
       skills: p.skills,
     },
     readyAnswers: [...answers.values()],
-    drafts: (app.drafts as Drafts | null) ?? { pitch: "", whyCompany: "" },
+    drafts: withMessage(app.drafts as Partial<Drafts> | null, {
+      name: p.personal.name,
+      headline: p.headline,
+      skills: p.skills.map((s) => s.name),
+      jobTitle: job.title,
+      company: job.company,
+      linkedin: p.personal.linkedin,
+    }),
     cv,
   };
 }

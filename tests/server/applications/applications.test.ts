@@ -82,10 +82,10 @@ describe("prepare_apply", () => {
       call = claimNext(db, { runner: "bridge", types: ["llm_call"] });
       if (!call) await new Promise((r) => setTimeout(r, 20));
     }
-    completeTask(db, call!.id, { structured: { pitch: "Sou dev Laravel.", whyCompany: "Gosto do produto." }, usage: { inputTokens: 1, outputTokens: 1, costUsd: 0 } });
+    completeTask(db, call!.id, { structured: { pitch: "Sou dev Laravel.", whyCompany: "Gosto do produto.", message: "Olá, pessoal!" }, usage: { inputTokens: 1, outputTokens: 1, costUsd: 0 } });
     await pending;
     const app = getApplication(db, id)!;
-    expect(app.drafts).toEqual({ pitch: "Sou dev Laravel.", whyCompany: "Gosto do produto." });
+    expect(app.drafts).toEqual({ pitch: "Sou dev Laravel.", whyCompany: "Gosto do produto.", message: "Olá, pessoal!" });
     const apply = getTask(db, app.taskId!)!;
     expect(apply).toMatchObject({ type: "apply", runner: "bridge", status: "queued" });
     expect((apply.payload as { jobUrl: string }).jobUrl).toBe("https://empresa.gupy.io/job/1");
@@ -118,7 +118,8 @@ describe("buildApplyPayload", () => {
       { question: "Q extra", answer: "A extra" },
     ]);
     expect(payload.cv).toEqual({ filename: "cv.pdf", base64: Buffer.from("%PDF-1.4 teste").toString("base64") });
-    expect(payload.drafts).toEqual({ pitch: "p", whyCompany: "w" });
+    expect(payload.drafts.pitch).toBe("p");
+    expect(payload.drafts.message).toContain("Dev Laravel"); // sem mensagem da IA → mensagem genérica da vaga
     expect(payload.profile.personal.email).toBe("caio@example.com");
   });
 });

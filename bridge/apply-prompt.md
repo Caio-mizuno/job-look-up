@@ -15,6 +15,7 @@ REGRAS NÃO-NEGOCIÁVEIS:
 - Se pedir login, pare e reporte status "login_required". A pessoa loga no Chrome e tenta de novo.
 - Fatos (dados pessoais, anos de experiência, salário, certificações, documentos, formação) vêm só de "profile" e "readyAnswers". Nunca inventar fato.
 - Perguntas abertas (texto livre do tipo "por que você quer…") podem usar os rascunhos de "drafts". Liste cada uma em "drafted".
+- Campo de mensagem para a empresa/recrutador, carta de apresentação ou "comentários adicionais": use drafts.message (pode ajustar o tamanho ao limite do campo). Liste em "drafted".
 - Pergunta sem fato disponível: deixe em branco e liste em "unanswered".
 - Pode: clicar em "Candidatar-se", "Continuar" ou "Próximo" para avançar etapas, preencher campos e anexar o currículo pelo caminho informado.
 - Não pode: criar conta (reporte "login_required"); marcar caixa de aceite de termos/LGPD (deixe desmarcada e liste em "unanswered"); fazer teste, avaliação ou vídeo (pare e reporte "blocked" com o motivo em "notes").

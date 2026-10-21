@@ -40,6 +40,8 @@ export const APPLY_COPY = {
     personal: "Seus dados",
     answers: "Respostas prontas",
     drafts: "Pitch e \"por que esta empresa\"",
+    message: "Mensagem para a empresa",
+    messageHint: "Genérica e amigável. Gere com IA para personalizar para esta vaga.",
     generate: "Gerar com IA",
     generating: "Gerando…",
     pitch: "Pitch",

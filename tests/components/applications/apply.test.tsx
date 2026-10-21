@@ -81,6 +81,18 @@ describe("UnansweredForm", () => {
   });
 });
 
+describe("Kit message", () => {
+  it("renders the company message with a copy button", async () => {
+    const { CompanyMessage } = await import("@/components/applications/application-kit");
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<CompanyMessage message="Olá, pessoal da X!" />);
+    expect(screen.getByText("Mensagem para a empresa")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Copiar Mensagem para a empresa/ }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith("Olá, pessoal da X!"));
+  });
+});
+
 describe("Kit", () => {
   it("copy button writes to clipboard", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
