@@ -1,3 +1,4 @@
+import { syncApplicationsWithTasks } from "@/server/applications/sync";
 import { getDb } from "@/server/db/client";
 import { recoverOnBoot } from "@/server/pipeline/recover";
 import { maybeScheduleSearch } from "@/server/pipeline/schedule";
@@ -13,6 +14,7 @@ const stop = startWorker({
   handlers,
   tick: (tickDb, now) => {
     requeueStale(tickDb, now);
+    syncApplicationsWithTasks(tickDb);
     maybeScheduleSearch(tickDb, now);
   },
 });

@@ -5,15 +5,36 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { AuthError, createAppClient } from "./http.mjs";
+import { runApply } from "./apply.mjs";
 import { runLlmCall } from "./llm.mjs";
 
 const POLL_MS = 2000;
+const EVENTS_FLUSH_MS = 1000;
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 /** Executores por tipo de tarefa e quantas rodam ao mesmo tempo. */
 const EXECUTORS = {
   // 4 em paralelo: a análise das top 40 (8 lotes) fica perto de 1 minuto.
   llm_call: { slots: 4, run: (payload) => runLlmCall(payload) },
+  // Uma candidatura por vez: é o Chrome da pessoa.
+  apply: {
+    slots: 1,
+    run: async (payload, task, client) => {
+      const pending = [];
+      const flush = () => {
+        if (pending.length === 0) return Promise.resolve();
+        return client.postEvents(task.id, pending.splice(0)).catch(() => {});
+      };
+      const timer = setInterval(flush, EVENTS_FLUSH_MS);
+      try {
+        const report = await runApply(payload, { onEvent: (e) => pending.push(e) });
+        return { report };
+      } finally {
+        clearInterval(timer);
+        await flush();
+      }
+    },
+  },
 };
 
 const log = (msg) => console.log(`[bridge] ${msg}`);
@@ -65,7 +86,7 @@ export async function main() {
     busy[task.type]++;
     const t0 = Date.now();
     const p = EXECUTORS[task.type]
-      .run(task.payload, task)
+      .run(task.payload, task, client)
       .then((result) => client.postResult(task.id, { ok: true, result }).then(() => "ok"))
       .catch((err) => {
         const error = err instanceof Error ? err.message : String(err);

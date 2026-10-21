@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { applyReport, failApplication, getApplicationByTask } from "@/server/applications/repo";
+import { ApplyReportSchema } from "@/server/applications/schema";
 import type { Db } from "@/server/db/client";
 import type { Task } from "@/server/tasks/queue";
 
@@ -9,6 +11,28 @@ export const BridgeResultBody = z.union([
 export type BridgeResultBody = z.infer<typeof BridgeResultBody>;
 
 /** Ganchos por tipo de tarefa quando o ajudante pega ou devolve uma tarefa. */
-export function onClaim(_db: Db, _task: Task): void {}
+export function onClaim(db: Db, task: Task): void {
+  if (task.type !== "apply") return;
+  db.$client
+    .prepare("update applications set status = 'running', started_at = ? where task_id = ?")
+    .run(Date.now(), task.id);
+}
 
-export function onResult(_db: Db, _task: Task, _body: BridgeResultBody): void {}
+export function onResult(db: Db, task: Task, body: BridgeResultBody): void {
+  if (task.type !== "apply") return;
+  const app = getApplicationByTask(db, task.id);
+  if (!app) return;
+  const now = Date.now();
+  if (!body.ok) {
+    // Candidatura não repete sozinha (abriria outra aba no Chrome): falha e a pessoa decide.
+    db.$client.prepare("update tasks set status = 'failed', error = ? where id = ?").run(body.error, task.id);
+    failApplication(db, app.id, body.error, now);
+    return;
+  }
+  const parsed = z.object({ report: ApplyReportSchema }).safeParse(body.result);
+  if (!parsed.success) {
+    failApplication(db, app.id, "relatório do ajudante em formato inválido", now);
+    return;
+  }
+  applyReport(db, app.id, parsed.data.report, now);
+}

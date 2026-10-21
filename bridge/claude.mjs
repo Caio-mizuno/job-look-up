@@ -77,3 +77,18 @@ export async function spawnClaude(args, opts) {
     if (ownCwd) await rm(ownCwd, { recursive: true, force: true });
   }
 }
+
+/**
+ * Args da candidatura, validados no spike (spike/RESULT.md, variante A4).
+ * O upload de arquivo exige permissão de leitura: `Read` fica restrito ao cwd temporário e à pasta do CV.
+ * @param {string} cvDir
+ * @returns {string[]}
+ */
+export function buildApplyArgs(cvDir) {
+  return [
+    "-p", "--chrome", "--output-format", "stream-json", "--verbose", "--no-session-persistence",
+    "--setting-sources", "project", "--strict-mcp-config",
+    "--tools", "Read", "--add-dir", cvDir,
+    "--allowedTools", "mcp__claude-in-chrome__*", "Read",
+  ];
+}

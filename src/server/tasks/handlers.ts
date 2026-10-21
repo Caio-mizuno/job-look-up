@@ -1,3 +1,4 @@
+import { draftAnswersHandler, prepareApplyHandler } from "@/server/applications/drafts";
 import type { Db } from "@/server/db/client";
 import { extractProfileHandler } from "@/server/import/extract-profile";
 import { llmTestHandler } from "@/server/llm/test-handler";
@@ -15,4 +16,6 @@ export const handlers: Partial<Record<TaskType, Handler>> = {
   generate_queries: generateQueriesHandler,
   search_run: searchRunHandler,
   enrich: enrichHandler,
+  prepare_apply: prepareApplyHandler,
+  draft_answers: draftAnswersHandler,
 };
