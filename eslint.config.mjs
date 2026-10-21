@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Bundle gerado do worker e dados locais.
+    "dist/**",
+    "data/**",
   ]),
 ]);
 
