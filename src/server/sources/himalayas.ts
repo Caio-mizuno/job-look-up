@@ -1,5 +1,6 @@
 import { formatSalaryRange } from "./salary";
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 type HimalayasJob = {
@@ -19,7 +20,7 @@ type HimalayasJob = {
 
 export const himalayasSource: JobSource = {
   id: "himalayas",
-  label: "Himalayas",
+  label: SOURCE_LABELS.himalayas,
   homepage: "https://himalayas.app",
   defaultEnabled: true,
   maxPages: 1,

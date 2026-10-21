@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 const API = "https://www.linkedin.com/jobs-guest/jobs/api";
@@ -7,7 +8,7 @@ const API = "https://www.linkedin.com/jobs-guest/jobs/api";
 /** Endpoint público sem login. Nunca usa a conta da pessoa; pode ser bloqueado (429). */
 export const linkedinSource: JobSource = {
   id: "linkedin",
-  label: "LinkedIn",
+  label: SOURCE_LABELS.linkedin,
   homepage: "https://www.linkedin.com/jobs",
   defaultEnabled: false,
   maxPages: 2,

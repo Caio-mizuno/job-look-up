@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 const BASE = "https://programathor.com.br";
@@ -6,7 +7,7 @@ const BASE = "https://programathor.com.br";
 /** Só a listagem: a página de detalhe responde 500 para clientes HTTP (verificado em 2026-10-21). */
 export const programathorSource: JobSource = {
   id: "programathor",
-  label: "Programathor",
+  label: SOURCE_LABELS.programathor,
   homepage: BASE,
   defaultEnabled: true,
   maxPages: 2,

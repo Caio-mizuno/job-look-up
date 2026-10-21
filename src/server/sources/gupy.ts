@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 type GupyJob = {
@@ -26,7 +27,7 @@ const BROWSER_UA =
 /** O portal da Gupy é Next.js: a primeira página de resultados vem pronta no __NEXT_DATA__. */
 export const gupySource: JobSource = {
   id: "gupy",
-  label: "Gupy",
+  label: SOURCE_LABELS.gupy,
   homepage: "https://portal.gupy.io",
   defaultEnabled: true,
   maxPages: 1,

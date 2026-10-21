@@ -1,5 +1,6 @@
 import { matchesKeywords } from "./match";
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 type ArbeitnowJob = {
@@ -16,7 +17,7 @@ type ArbeitnowJob = {
 /** Foco em Europa e sem busca na API: filtro local por título; desligada por padrão. */
 export const arbeitnowSource: JobSource = {
   id: "arbeitnow",
-  label: "Arbeitnow",
+  label: SOURCE_LABELS.arbeitnow,
   homepage: "https://www.arbeitnow.com",
   defaultEnabled: false,
   maxPages: 2,

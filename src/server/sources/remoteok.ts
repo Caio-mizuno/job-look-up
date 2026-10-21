@@ -1,6 +1,7 @@
 import { matchesKeywords } from "./match";
 import { formatSalaryRange } from "./salary";
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 type RemoteOkJob = {
@@ -21,7 +22,7 @@ type RemoteOkJob = {
  */
 export const remoteokSource: JobSource = {
   id: "remoteok",
-  label: "Remote OK",
+  label: SOURCE_LABELS.remoteok,
   homepage: "https://remoteok.com",
   defaultEnabled: true,
   maxPages: 1,

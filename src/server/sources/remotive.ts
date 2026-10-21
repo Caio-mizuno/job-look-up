@@ -1,4 +1,5 @@
 import { htmlToText } from "./text";
+import { SOURCE_LABELS } from "./labels";
 import type { JobSource, RawJob } from "./types";
 
 type RemotiveJob = {
@@ -16,7 +17,7 @@ type RemotiveJob = {
 /** Termos da Remotive: link de volta, crédito à fonte e no máximo ~4 consultas por dia (cache de 6 h). */
 export const remotiveSource: JobSource = {
   id: "remotive",
-  label: "Remotive",
+  label: SOURCE_LABELS.remotive,
   homepage: "https://remotive.com",
   defaultEnabled: true,
   maxPages: 1,
