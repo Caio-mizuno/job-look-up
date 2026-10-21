@@ -26,7 +26,7 @@ describe("profile schema", () => {
 describe("profile repo", () => {
   it("version stable across key order and changes on edit", () => {
     const p = sampleProfile();
-    const reordered = JSON.parse(JSON.stringify({ preferences: p.preferences, ...p }));
+    const reordered = Object.fromEntries(Object.entries(p).reverse()) as typeof p;
     expect(profileVersion(reordered)).toBe(profileVersion(p));
     expect(profileVersion({ ...p, headline: "Outro" })).not.toBe(profileVersion(p));
     expect(profileVersion(p)).toMatch(/^[0-9a-f]{16}$/);
