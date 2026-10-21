@@ -2,7 +2,6 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-// @ts-expect-error script .mjs sem tipos
 import { setupEnv } from "../../scripts/setup-env.mjs";
 
 function fixture() {
