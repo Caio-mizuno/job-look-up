@@ -1,0 +1,65 @@
+{
+ "data": [
+  {
+   "slug": "finanzbuchhalter-teilzeit-oder-vollzeit-wiesbaden-307382",
+   "company_name": "Verticas GmbH",
+   "title": "Finanzbuchhalter (m/w/d) – Teilzeit oder Vollzeit",
+   "description": "<strong>DIE ZUKUNFT PLANEN MIT VERTICAS</strong><br><br>VERTICAS ist einer der führenden Full-Service-Dienstleister in Deutschland und macht mit Leidenschaft Markenauftritte greifbar! Wir vereinen drei wesentliche Kompetenzen: die Kreativität einer Werbeagentur, das Produkt-Know-how eines Werbeartikelhändlers und das Produktions- und Beschaffungswissen eines international tätigen Importeurs.<br><br><strong>Wir bieten Dir:</strong><br><br><ul><li><strong>Flexibles & hybrides Arbeiten</strong> – Dank unserer Kernarbeitszeit und flexiblen Arbeitszeitgestaltung kannst Du Deinen Arbeitstag individuell planen. Zusätzlich hast Du auch die Möglichkeit, mobil von zuhause zu arbeiten – für eine optimale Vereinbarkeit von Beruf, Familie und Privatleben.</li><li><strong>Per-Du-Kultur</strong> – Wir be",
+   "remote": false,
+   "url": "https://www.arbeitnow.com/jobs/companies/verticas-gmbh/finanzbuchhalter-teilzeit-oder-vollzeit-wiesbaden-307382",
+   "tags": [
+    "Finance"
+   ],
+   "job_types": [
+    "Side",
+    "berufserfahren"
+   ],
+   "location": "Wiesbaden",
+   "created_at": 1792562448
+  },
+  {
+   "slug": "senior-software-engineer-munich-212401",
+   "company_name": "Auterion",
+   "title": "Senior Software Engineer",
+   "description": "&lt;p&gt;We are looking for a hands-on Autonomous Drone Software Engineer to join a swarming programme. As an engineer on a lean, high-impact team, you will have the opportunity to drive development of new features, have a say in architecture and design decisions and have real impact across all the team’s projects.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;You will not be siloed; this role spans the entire autonomy lifecycle, from developing autonomy capabilities to investigating real-world flight-test data.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;The ideal candidate is someone who’s a self-starter, can work independently, can work with ambiguity, can take decisions on their own and not be afraid to drive and push towards getting the project across the finish line.&lt;/p&gt;\n&lt;p&gt;&lt;strong&gt;Responsibilitie",
+   "remote": false,
+   "url": "https://www.arbeitnow.com/jobs/companies/auterion/senior-software-engineer-munich-212401",
+   "tags": [
+    "Engineering"
+   ],
+   "job_types": [],
+   "location": "Munich",
+   "created_at": 1792562115
+  },
+  {
+   "slug": "forward-deployed-engineer-munich-434037",
+   "company_name": "Auterion",
+   "title": "Forward Deployed Engineer",
+   "description": "&lt;p&gt;As a Forward Deployed Engineer at Auterion, you will play a pivotal role in the successful development, integration and deployment of Auterion-powered drone systems.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;In this role, you will collaborate closely with the production, hardware engineering, and firmware/software teams, as well as operations, ensuring that every platform transitions smoothly from an airframe concept into a fully validated flying robot ready for deployment. You will serve as the primary technical interface for partners, work closely with them to understand their technical requirements, configure and adapt existing solutions, contribute to core software development, and ensure successful implementation.&amp;nbsp;&lt;/p&gt;\n&lt;p&gt;This role is ideal for an engineer who enjoys ",
+   "remote": false,
+   "url": "https://www.arbeitnow.com/jobs/companies/auterion/forward-deployed-engineer-munich-434037",
+   "tags": [
+    "Engineering"
+   ],
+   "job_types": [],
+   "location": "Munich",
+   "created_at": 1792562115
+  }
+ ],
+ "links": {
+  "first": "https://www.arbeitnow.com/api/job-board-api?page=1",
+  "last": null,
+  "prev": null,
+  "next": "https://www.arbeitnow.com/api/job-board-api?page=2"
+ },
+ "meta": {
+  "current_page": 1,
+  "current_page_url": "https://www.arbeitnow.com/api/job-board-api?page=1",
+  "from": 1,
+  "path": "https://www.arbeitnow.com/api/job-board-api",
+  "per_page": 300,
+  "to": 300,
+  "terms": "This is a free public API for jobs, please do not abuse. I would appreciate linking back to the site. By using the API, you agree to the terms of service present on Arbeitnow.com",
+  "info": "Jobs are updated every hour and order by the `created_at` timestamp. Use `?page=` to paginate. Read more information here: https://www.arbeitnow.com/blog/job-board-api"
+ }
+}
