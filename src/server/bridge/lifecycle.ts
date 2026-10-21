@@ -20,6 +20,8 @@ export function onClaim(db: Db, task: Task): void {
 
 export function onResult(db: Db, task: Task, body: BridgeResultBody): void {
   if (task.type !== "apply") return;
+  // O CV só serve para o ajudante; não fica guardado no histórico de tarefas.
+  db.$client.prepare("update tasks set payload = json_remove(payload, '$.cv') where id = ?").run(task.id);
   const app = getApplicationByTask(db, task.id);
   if (!app) return;
   const now = Date.now();

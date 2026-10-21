@@ -142,6 +142,17 @@ describe("lifecycle", () => {
     expect(getApplication(db, id)).toMatchObject({ status: "needs_review", report: report() });
   });
 
+  it("drops the CV bytes from the task payload once the bridge reports back", () => {
+    const db = memDb();
+    const jobId = addJob(db);
+    const { id } = createApplication(db, jobId, NOW) as { id: number };
+    const taskId = enqueue(db, { type: "apply", runner: "bridge", payload: { jobUrl: "https://x", cv: { filename: "cv.pdf", base64: "AAAA" } } });
+    db.$client.prepare("update applications set task_id = ? where id = ?").run(taskId, id);
+    const task = claimNext(db, { runner: "bridge", types: ["apply"] })!;
+    onResult(db, task, { ok: true, result: { report: report() } });
+    expect(getTask(db, taskId)?.payload).toEqual({ jobUrl: "https://x" });
+  });
+
   it("applyReport maps statuses", () => {
     const db = memDb();
     const { id } = queuedApply(db);
