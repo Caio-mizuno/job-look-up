@@ -2,7 +2,7 @@ import type { Db } from "@/server/db/client";
 import type { ApplicationStatus } from "@/server/db/schema";
 import { getProfile, saveProfile } from "@/server/profile/repo";
 import { enqueue } from "@/server/tasks/queue";
-import { isAutoApplyAllowed } from "./payload";
+import { isAutoApplyAllowed } from "@/lib/apply-url";
 import type { ApplyEvent, ApplyReport, Drafts, ExtraAnswer } from "./schema";
 
 const MAX_EVENTS = 500;
@@ -23,7 +23,7 @@ export type Application = {
   finishedAt: number | null;
 };
 
-type Row = {
+export type ApplicationRow = {
   id: number;
   job_id: number;
   status: ApplicationStatus;
@@ -38,7 +38,7 @@ type Row = {
   finished_at: number | null;
 };
 
-export function toApplication(r: Row): Application {
+export function toApplication(r: ApplicationRow): Application {
   return {
     id: r.id,
     jobId: r.job_id,
@@ -56,12 +56,12 @@ export function toApplication(r: Row): Application {
 }
 
 export function getApplication(db: Db, id: number): Application | null {
-  const row = db.$client.prepare("select * from applications where id = ?").get(id) as Row | undefined;
+  const row = db.$client.prepare("select * from applications where id = ?").get(id) as ApplicationRow | undefined;
   return row ? toApplication(row) : null;
 }
 
 export function getApplicationByTask(db: Db, taskId: number): Application | null {
-  const row = db.$client.prepare("select * from applications where task_id = ?").get(taskId) as Row | undefined;
+  const row = db.$client.prepare("select * from applications where task_id = ?").get(taskId) as ApplicationRow | undefined;
   return row ? toApplication(row) : null;
 }
 

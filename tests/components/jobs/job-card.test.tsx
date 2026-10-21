@@ -22,6 +22,7 @@ const item = (over: Partial<JobListItem> = {}): JobListItem => ({
   isNew: false,
   analysis: "pending",
   enrichment: null,
+  application: null,
   ...over,
 });
 

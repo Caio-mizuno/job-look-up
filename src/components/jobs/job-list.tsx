@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
-import { discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
+import { applyToJob, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
 import { startSearch } from "@/app/(app)/vagas/search-actions";
+import { ApplicationKit } from "@/components/applications/application-kit";
+import { ApplyButton } from "@/components/applications/apply-button";
+import { APPLY_COPY } from "@/components/applications/copy";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -38,25 +41,17 @@ function query(filters: Filters, lastVisitAt: number, extra: Record<string, stri
   return p.toString();
 }
 
-export type ListRenderExtras = {
-  /** Slot para a Task de candidaturas acrescentar ações no card. */
-  renderActions?: (job: JobListItem) => React.ReactNode;
-  renderHint?: (job: JobListItem) => React.ReactNode;
-};
-
 export function JobList({
   initialItems,
   initialCursor,
   lastVisitAt,
   profile,
-  renderActions,
-  renderHint,
 }: {
   initialItems: JobListItem[];
   initialCursor: string | null;
   lastVisitAt: number;
   profile: ProfileSummary;
-} & ListRenderExtras) {
+}) {
   const status = useAppStatus(POLL_MS);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [items, setItems] = useState(initialItems);
@@ -67,6 +62,7 @@ export function JobList({
   const [compactOverride, setCompact] = useState<boolean | null>(null);
   const compact = compactOverride ?? storedCompact;
   const [searchRequested, setSearchRequested] = useState(false);
+  const [kitJobId, setKitJobId] = useState<number | null>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const loadedCount = useRef(initialItems.length);
   useEffect(() => {
@@ -100,7 +96,8 @@ export function JobList({
   }, [cursor, filters, lastVisitAt, loading]);
 
   // Enquanto há busca ou análise acontecendo, a lista se atualiza sozinha.
-  const busy = searchRequested || status?.run?.status === "running" || (status?.pendingAnalysis ?? 0) > 0;
+  const applying = items.some((j) => j.application?.status === "queued" || j.application?.status === "running");
+  const busy = searchRequested || applying || status?.run?.status === "running" || (status?.pendingAnalysis ?? 0) > 0;
   useEffect(() => {
     if (!busy) return;
     const timer = setInterval(() => void reload(filters, true), POLL_MS);
@@ -140,6 +137,21 @@ export function JobList({
         },
       },
     });
+  };
+
+  const onApply = async (job: JobListItem) => {
+    if (!status?.bridgeOnline) {
+      toast.warning(APPLY_COPY.bridgeOff);
+      setKitJobId(job.id);
+      return;
+    }
+    const res = await applyToJob(job.id);
+    if (!res.ok) {
+      setKitJobId(job.id);
+      return;
+    }
+    toast.success(APPLY_COPY.queuedToast);
+    void reload(filters, true);
   };
 
   const onSearch = async () => {
@@ -201,12 +213,19 @@ export function JobList({
             onRecalc={(id) => {
               void recalcJob(id).then(() => reload(filters, true));
             }}
-            actions={renderActions?.(job)}
-            hint={renderHint?.(job)}
+            actions={
+              <ApplyButton
+                url={job.url}
+                application={job.application}
+                onApply={() => void onApply(job)}
+                onOpenKit={() => setKitJobId(job.id)}
+              />
+            }
           />
         ))}
       </div>
       <div ref={sentinel} aria-hidden />
+      <ApplicationKit jobId={kitJobId} open={kitJobId !== null} onOpenChange={(v) => !v && setKitJobId(null)} />
       {loading && <Skeleton className="h-24 w-full" />}
     </div>
   );

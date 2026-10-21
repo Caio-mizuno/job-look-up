@@ -1,7 +1,9 @@
 "use server";
 
+import { createApplication, getApplication, retryApplication } from "@/server/applications/repo";
 import { getDb } from "@/server/db/client";
 import { setJobStatus } from "@/server/jobs/list";
+import { getProfile } from "@/server/profile/repo";
 import { enqueue } from "@/server/tasks/queue";
 
 /** Reanalisa uma vaga (botão "Recalcular" / "Tentar de novo" no card). */
@@ -24,4 +26,63 @@ export async function discardJob(id: number): Promise<void> {
 
 export async function restoreJob(id: number): Promise<void> {
   setJobStatus(getDb(), id, "seen", Date.now());
+}
+
+/** "Quero participar": cria a candidatura ou repete a última que falhou/pediu login. */
+export async function applyToJob(jobId: number): Promise<{ ok: true; id: number } | { ok: false; error: "linkedin" | "not_found" }> {
+  const db = getDb();
+  const last = db.$client
+    .prepare("select id from applications where job_id = ? and status in ('failed', 'login_required') order by id desc limit 1")
+    .get(jobId) as { id: number } | undefined;
+  if (last && getApplication(db, last.id)) {
+    retryApplication(db, last.id, Date.now());
+    return { ok: true, id: last.id };
+  }
+  const res = createApplication(db, jobId, Date.now());
+  return "id" in res ? { ok: true, id: res.id } : { ok: false, error: res.error };
+}
+
+export async function generateDrafts(jobId: number): Promise<{ taskId: number }> {
+  return { taskId: enqueue(getDb(), { type: "draft_answers", payload: { jobId } }) };
+}
+
+export type KitData = {
+  jobTitle: string;
+  jobUrl: string;
+  fields: { label: string; value: string }[];
+  answers: { question: string; answer: string }[];
+  drafts: { pitch: string; whyCompany: string } | null;
+};
+
+export async function getKitData(jobId: number): Promise<KitData | null> {
+  const db = getDb();
+  const job = db.$client.prepare("select title, url from jobs where id = ?").get(jobId) as { title: string; url: string } | undefined;
+  if (!job) return null;
+  const p = getProfile(db)?.data;
+  const d = db.$client
+    .prepare("select drafts from applications where job_id = ? and drafts is not null order by id desc limit 1")
+    .get(jobId) as { drafts: string } | undefined;
+  const lastJob = p?.experiences.find((e) => e.end === null) ?? p?.experiences[0];
+  const fields = p
+    ? [
+        { label: "Nome", value: p.personal.name },
+        { label: "E-mail", value: p.personal.email },
+        { label: "Telefone", value: p.personal.phone },
+        { label: "Cidade", value: [p.personal.city, p.personal.state].filter(Boolean).join(" - ") },
+        { label: "LinkedIn", value: p.personal.linkedin },
+        { label: "GitHub", value: p.personal.github },
+        { label: "Portfólio", value: p.personal.portfolio },
+        { label: "Título profissional", value: p.headline },
+        { label: "Resumo", value: p.summary },
+        { label: "Cargo atual", value: lastJob ? `${lastJob.title} — ${lastJob.company}` : "" },
+        { label: "Habilidades", value: p.skills.map((s) => s.name).join(", ") },
+      ]
+    : [];
+  return {
+    jobTitle: job.title,
+    jobUrl: job.url,
+    fields,
+    answers: (p?.readyAnswers ?? []).filter((a) => a.answer.trim()),
+    drafts: d ? JSON.parse(d.drafts) : null,
+  };
 }

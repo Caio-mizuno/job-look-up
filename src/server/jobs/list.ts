@@ -1,5 +1,5 @@
 import type { Db } from "@/server/db/client";
-import type { JobStatus } from "@/server/db/schema";
+import type { ApplicationStatus, JobStatus } from "@/server/db/schema";
 import type { Contract, Seniority, WorkModel } from "@/server/domain/enums";
 import type { Enrichment } from "@/server/pipeline/enrich";
 import { getSource } from "@/server/sources/registry";
@@ -36,6 +36,7 @@ export type JobListItem = {
   /** pending = na fila de análise; none = fora do top-K, só analisa se a pessoa pedir. */
   analysis: "done" | "pending" | "failed" | "none";
   enrichment: (Omit<Enrichment, "jobId"> & { stale: boolean }) | null;
+  application: { id: number; status: ApplicationStatus } | null;
 };
 
 type Row = {
@@ -57,6 +58,8 @@ type Row = {
   e_data: string | null;
   e_version: string | null;
   queued: number;
+  app_id: number | null;
+  app_status: ApplicationStatus | null;
   k1: number;
   k2: number;
 };
@@ -111,11 +114,16 @@ export function listJobs(
                 select 1 from tasks t, json_each(t.payload, '$.jobIds') ids
                 where t.type = 'enrich' and t.status in ('queued', 'running') and ids.value = j.id
               ) queued,
+              a.id app_id, a.status app_status,
               ${k1} k1, ${k2} k2
        from jobs j
        left join job_enrichment e on e.rowid = (
          select e2.rowid from job_enrichment e2 where e2.job_id = j.id
          order by (e2.profile_version = ?) desc, e2.created_at desc limit 1
+       )
+       left join applications a on a.id = (
+         select a2.id from applications a2 where a2.job_id = j.id and a2.status != 'cancelled'
+         order by a2.created_at desc, a2.id desc limit 1
        )
        where ${where.join(" and ")}
        order by k1 desc, k2 desc, j.id desc
@@ -155,6 +163,7 @@ function toItem(r: Row, ctx: { profileVersion: string | null; lastVisitAt: numbe
       data && r.e_score !== null
         ? { ...data, matchScore: r.e_score, stale: r.e_version !== ctx.profileVersion }
         : null,
+    application: r.app_id !== null && r.app_status ? { id: r.app_id, status: r.app_status } : null,
   };
 }
 

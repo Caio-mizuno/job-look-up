@@ -6,17 +6,7 @@ import { emptyProfile } from "@/server/profile/schema";
 import { getApplication } from "./repo";
 import type { ApplyPayload, Drafts } from "./schema";
 
-const LINKEDIN = /(^|\.)linkedin\.com$|^lnkd\.in$/i;
-
-/** LinkedIn nunca é preenchido automaticamente (risco de bloqueio da conta): só o Kit manual. */
-export function isAutoApplyAllowed(url: string): boolean {
-  try {
-    const u = new URL(url);
-    return (u.protocol === "http:" || u.protocol === "https:") && !LINKEDIN.test(u.hostname);
-  } catch {
-    return false;
-  }
-}
+export { isAutoApplyAllowed } from "@/lib/apply-url";
 
 export function buildApplyPayload(db: Db, applicationId: number): ApplyPayload {
   const app = getApplication(db, applicationId);
