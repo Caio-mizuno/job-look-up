@@ -1,6 +1,6 @@
 # job-look-up
 
-Busca vagas de emprego com base no **seu** perfil, dá uma nota de match para cada uma e preenche a candidatura no **seu** Chrome, parando antes de enviar para você revisar.
+Busca vagas de emprego com base no **seu** perfil, dá uma nota de match para cada uma e preenche e envia a candidatura no **seu** Chrome. Se faltar alguma informação, para antes de enviar e pergunta para você.
 
 - Roda **100% na sua máquina** (Docker). Sem servidor online, sem conta, sem login.
 - A IA roda pela **sua assinatura do Claude** (via Claude Code). Não precisa de chave de API.
@@ -28,7 +28,7 @@ Busca vagas de emprego com base no **seu** perfil, dá uma nota de match para ca
 1. **Onboarding.** Você monta o perfil em 8 etapas. Dá para importar o currículo em PDF, `.md` ou texto colado; no LinkedIn, use **Perfil → Mais → Salvar como PDF**.
 2. **Busca.** A IA gera consultas a partir do perfil e o worker consulta as fontes em paralelo, junta duplicatas e filtra pelo que você procura.
 3. **Análise.** As 40 melhores vagas recebem nota de 0 a 100, "por que combina", o que a vaga oferece, o que você vai fazer e os requisitos.
-4. **Candidatura.** Em "Quero participar", o ajudante abre a vaga no seu Chrome, preenche com os seus dados, anexa o CV e **não clica em Enviar**. O que faltou volta para o app para você responder.
+4. **Candidatura.** Em "Quero participar", o ajudante abre a vaga no seu Chrome, preenche com os seus dados, anexa o CV e **envia** quando está tudo preenchido. O que faltou volta para o app para você responder.
 
 ## Requisitos
 
@@ -72,8 +72,9 @@ Seus dados ficam em `./data` (banco SQLite e CV). Para backup, copie essa pasta.
 
 **Faz:** abre a vaga, avança as etapas, preenche os campos com dados do seu perfil e das suas respostas prontas, anexa o CV e usa rascunhos da IA em perguntas abertas, sempre marcados como rascunho.
 
+**Envia** quando todos os campos obrigatórios foram preenchidos com dados seus e a página confirma o envio. Se faltar algo, para e deixa a aba aberta para você.
+
 **Não faz, nunca:**
-- clicar no botão final de enviar;
 - criar conta;
 - aceitar termos ou LGPD;
 - fazer testes ou vídeos;
@@ -140,7 +141,7 @@ A stack inclui Next.js 16, React 19, Tailwind v4, shadcn/ui, SQLite (better-sqli
 1. You build a profile in an onboarding wizard; importing a PDF or text works.
 2. It searches several job boards in parallel: Brazilian boards plus remote-first international ones. Indeed and Glassdoor are opt-in: the helper opens them in a separate Chrome profile and stops if the site asks for a captcha.
 3. Claude (through your own Claude Code subscription, via a small host helper) scores each job against your profile and summarizes it.
-4. On "apply", Claude in Chrome fills the application in **your** Chrome and **stops before submitting**.
+4. On "apply", Claude in Chrome fills and **submits** the application in **your** Chrome; if a required answer is missing it stops before submitting and asks you.
 
 Everything runs on your machine with Docker (`make up`, then http://127.0.0.1:3000). Data stays in `./data`. LinkedIn is never automated; the app gives you a copy-paste kit for those jobs instead. MIT licensed.
 

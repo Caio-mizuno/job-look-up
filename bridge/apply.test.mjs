@@ -37,7 +37,9 @@ describe("apply prompt", () => {
   it("contains every non-negotiable rule", () => {
     for (const s of [
       "Nunca inventar fato",
-      "Nunca clicar no botão final",
+      "submitted",
+      "Nunca clique em enviar duas vezes",
+      "NÃO envie",
       "login_required",
       "drafted",
       "unanswered",
@@ -110,6 +112,15 @@ describe("runApply", () => {
     });
     expect(r).toMatchObject({ status: "error", notes: "timeout" });
     expect(existsSync(cwd)).toBe(false);
+  });
+
+  it("returns submitted when the form was sent", async () => {
+    const done = '```json\n{"status":"submitted","filled":["Nome: Ana"],"drafted":[],"unanswered":[],"notes":"confirmação exibida"}\n```';
+    const r = await runApply(payload(), {
+      spawn: fakeSpawn([JSON.stringify({ type: "result", result: done })]),
+      tmpRoot: tmpdir(),
+    });
+    expect(r).toMatchObject({ status: "submitted", unanswered: [], notes: "confirmação exibida" });
   });
 
   it("returns error report when no report is found", async () => {

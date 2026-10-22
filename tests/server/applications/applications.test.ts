@@ -158,6 +158,7 @@ describe("lifecycle", () => {
     const db = memDb();
     const { id } = queuedApply(db);
     for (const [status, expected] of [
+      ["submitted", "submitted"],
       ["needs_review", "needs_review"],
       ["login_required", "login_required"],
       ["blocked", "failed"],
@@ -167,6 +168,15 @@ describe("lifecycle", () => {
       expect(getApplication(db, id)?.status).toBe(expected);
     }
     expect(getApplication(db, id)?.error).toBe("ok");
+  });
+
+  it("submitted report marks the job applied", () => {
+    const db = memDb();
+    const { id, jobId } = queuedApply(db);
+    applyReport(db, id, report({ status: "submitted", unanswered: [] }), NOW);
+    expect(getApplication(db, id)).toMatchObject({ status: "submitted", finishedAt: NOW, error: null });
+    const job = db.$client.prepare("select status from jobs where id = ?").get(jobId) as { status: string };
+    expect(job.status).toBe("applied");
   });
 
   it("invalid report or bridge error fails the application without auto-retry", () => {

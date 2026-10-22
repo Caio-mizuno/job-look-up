@@ -93,6 +93,7 @@ export function appendEvents(db: Db, id: number, events: ApplyEvent[]): void {
 }
 
 const REPORT_STATUS: Record<ApplyReport["status"], ApplicationStatus> = {
+  submitted: "submitted",
   needs_review: "needs_review",
   login_required: "login_required",
   blocked: "failed",
@@ -104,6 +105,12 @@ export function applyReport(db: Db, id: number, report: ApplyReport, now: number
   db.$client
     .prepare("update applications set status = ?, report = ?, error = ?, finished_at = ? where id = ? and status != 'cancelled'")
     .run(status, JSON.stringify(report), status === "failed" ? report.notes || report.status : null, now, id);
+  // Enviada pelo ajudante: a vaga sai de "interessado" como no "Marquei como enviada".
+  if (status === "submitted") {
+    db.$client
+      .prepare("update jobs set status = 'applied' where id = (select job_id from applications where id = ? and status = 'submitted')")
+      .run(id);
+  }
 }
 
 export function failApplication(db: Db, id: number, error: string, now: number): void {

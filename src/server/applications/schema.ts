@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Profile } from "@/server/profile/schema";
 
 export const ApplyReportSchema = z.object({
-  status: z.enum(["needs_review", "login_required", "blocked", "error"]),
+  status: z.enum(["submitted", "needs_review", "login_required", "blocked", "error"]),
   filled: z.array(z.string()),
   drafted: z.array(z.string()),
   unanswered: z.array(z.string()),

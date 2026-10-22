@@ -1,4 +1,4 @@
-// Executor de candidatura: Claude in Chrome preenche o formulário e para antes de enviar.
+// Executor de candidatura: Claude in Chrome preenche o formulário e envia quando está completo.
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,7 +7,7 @@ import { buildApplyArgs, spawnClaude } from "./claude.mjs";
 
 export const APPLY_TIMEOUT_MS = 600_000;
 const TEMPLATE = readFileSync(new URL("./apply-prompt.md", import.meta.url), "utf8");
-const STATUSES = new Set(["needs_review", "login_required", "blocked", "error"]);
+const STATUSES = new Set(["submitted", "needs_review", "login_required", "blocked", "error"]);
 
 /** Mesma regra do app, repetida aqui por defesa: LinkedIn e URLs não http(s) nunca vão para o Chrome. */
 export function isAutoApplyAllowed(url) {
