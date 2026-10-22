@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { JobList } from "@/components/jobs/job-list";
-import { consumeLastVisit, listJobs } from "@/server/jobs/list";
+import { consumeLastVisit, countDiscarded, listJobs } from "@/server/jobs/list";
 import { pageDb } from "@/server/page-db";
 import { getProfile } from "@/server/profile/repo";
 
@@ -25,6 +25,7 @@ export default async function VagasPage() {
       initialItems={initial.items}
       initialCursor={initial.nextCursor}
       lastVisitAt={lastVisitAt}
+      discardedCount={countDiscarded(db)}
       profile={{ name: profile.data.personal.name || "Seu perfil", headline: profile.data.headline, skills }}
     />
   );

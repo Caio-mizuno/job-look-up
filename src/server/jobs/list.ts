@@ -175,6 +175,16 @@ export function setJobStatus(db: Db, id: number, status: JobStatus, now: number)
     .run(status, status, now, id);
 }
 
+/** "Cache" de descartadas: o status sobrevive a buscas novas porque o upsert nunca mexe nele. */
+export function countDiscarded(db: Db): number {
+  return (db.$client.prepare("select count(*) c from jobs where status = 'discarded'").get() as { c: number }).c;
+}
+
+/** Limpar o cache: as descartadas voltam para a lista e para a análise das próximas buscas. */
+export function restoreDiscarded(db: Db): number {
+  return db.$client.prepare("update jobs set status = 'seen' where status = 'discarded'").run().changes;
+}
+
 /** Registra a visita à lista e devolve a anterior (base do selo "Nova"). */
 export function consumeLastVisit(db: Db, now: number = Date.now()): number {
   const previous = db.$client.prepare("select value from settings where key = 'search.lastVisitAt'").get() as

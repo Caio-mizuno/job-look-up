@@ -3,7 +3,7 @@
 import { buildCompanyMessage } from "@/server/applications/message";
 import { createApplication, getApplication, retryApplication } from "@/server/applications/repo";
 import { getDb } from "@/server/db/client";
-import { setJobStatus } from "@/server/jobs/list";
+import { restoreDiscarded, setJobStatus } from "@/server/jobs/list";
 import { getProfile } from "@/server/profile/repo";
 import { enqueue } from "@/server/tasks/queue";
 
@@ -27,6 +27,11 @@ export async function discardJob(id: number): Promise<void> {
 
 export async function restoreJob(id: number): Promise<void> {
   setJobStatus(getDb(), id, "seen", Date.now());
+}
+
+/** "Limpar cache" das descartadas; devolve quantas voltaram. */
+export async function clearDiscardedCache(): Promise<number> {
+  return restoreDiscarded(getDb());
 }
 
 /** "Quero participar": cria a candidatura ou repete a última que falhou/pediu login. */

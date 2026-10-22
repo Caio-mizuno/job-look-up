@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
-import { applyToJob, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
+import { applyToJob, clearDiscardedCache, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
 import { startSearch } from "@/app/(app)/vagas/search-actions";
 import { ApplicationKit } from "@/components/applications/application-kit";
 import { ApplyButton } from "@/components/applications/apply-button";
@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAppStatus } from "@/lib/use-app-status";
 import type { JobListItem } from "@/server/jobs/list";
 import { JOBS_COPY as C } from "./copy";
+import { DiscardedCache } from "./discarded-cache";
 import { JobCard } from "./job-card";
 import { EMPTY_FILTERS, JobFilters, type Filters } from "./job-filters";
 import { ProfileStrip, type ProfileSummary } from "./profile-strip";
@@ -45,11 +46,13 @@ export function JobList({
   initialItems,
   initialCursor,
   lastVisitAt,
+  discardedCount: initialDiscarded,
   profile,
 }: {
   initialItems: JobListItem[];
   initialCursor: string | null;
   lastVisitAt: number;
+  discardedCount: number;
   profile: ProfileSummary;
 }) {
   const status = useAppStatus(POLL_MS);
@@ -63,6 +66,7 @@ export function JobList({
   const compact = compactOverride ?? storedCompact;
   const [searchRequested, setSearchRequested] = useState(false);
   const [kitJobId, setKitJobId] = useState<number | null>(null);
+  const [discardedCount, setDiscardedCount] = useState(initialDiscarded);
   const sentinel = useRef<HTMLDivElement>(null);
   const loadedCount = useRef(initialItems.length);
   useEffect(() => {
@@ -128,11 +132,13 @@ export function JobList({
     const removed = items.find((j) => j.id === id);
     setItems((prev) => prev.filter((j) => j.id !== id));
     await discardJob(id);
+    setDiscardedCount((n) => n + 1);
     toast(C.discarded, {
       action: {
         label: C.undo,
         onClick: async () => {
           await restoreJob(id);
+          setDiscardedCount((n) => Math.max(0, n - 1));
           if (removed) void reload(filters, true);
         },
       },
@@ -154,6 +160,13 @@ export function JobList({
     void reload(filters, true);
   };
 
+  const onClearDiscarded = async () => {
+    const restored = await clearDiscardedCache();
+    setDiscardedCount(0);
+    toast(C.discardedCache.done(restored));
+    void reload(filters);
+  };
+
   const onSearch = async () => {
     setSearchRequested(true);
     await startSearch();
@@ -169,20 +182,23 @@ export function JobList({
       <SearchProgress run={status?.run ?? null} />
       <AnalysisBanner status={status} />
       <JobFilters value={filters} onChange={changeFilters} />
-      <label className="text-muted-foreground flex items-center gap-2 self-end text-xs">
-        <Switch
-          checked={compact}
-          onCheckedChange={(v) => {
-            setCompact(v);
-            try {
-              localStorage.setItem(COMPACT_KEY, v ? "1" : "0");
-            } catch {
-              // Sem storage (aba anônima): só não lembra a preferência.
-            }
-          }}
-        />
-        {C.compact}
-      </label>
+      <div className="flex items-center justify-end gap-3">
+        <DiscardedCache count={discardedCount} onConfirm={onClearDiscarded} />
+        <label className="text-muted-foreground flex items-center gap-2 text-xs">
+          <Switch
+            checked={compact}
+            onCheckedChange={(v) => {
+              setCompact(v);
+              try {
+                localStorage.setItem(COMPACT_KEY, v ? "1" : "0");
+              } catch {
+                // Sem storage (aba anônima): só não lembra a preferência.
+              }
+            }}
+          />
+          {C.compact}
+        </label>
+      </div>
 
       {items.length === 0 && running && (
         <div className="flex flex-col gap-3">
