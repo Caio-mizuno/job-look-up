@@ -3,7 +3,7 @@ SHELL := /bin/bash
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
 
-.PHONY: setup up down logs bridge bridge-deps
+.PHONY: setup up down logs bridge bridge-deps linkedin-login
 
 setup:
 	@node scripts/setup-env.mjs
@@ -20,6 +20,10 @@ bridge: bridge-deps
 # Única dependência do ajudante: playwright-core, para abrir Indeed e Glassdoor no Chrome instalado.
 bridge-deps:
 	@test -d bridge/node_modules/playwright-core || npm --prefix bridge ci --no-audit --no-fund
+
+# Login único do LinkedIn no Chrome do ajudante (busca de posts). Pare o `make bridge` antes.
+linkedin-login: bridge-deps
+	node bridge/login.mjs
 
 down:
 	docker compose down

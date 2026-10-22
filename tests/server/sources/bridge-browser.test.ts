@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { touchBridge } from "@/server/bridge/presence";
-import { createBridgeBrowser } from "@/server/sources/browser";
+import { createBridgeBrowser, LoginRequiredError } from "@/server/sources/browser";
 import { HttpError, RateLimitedError } from "@/server/sources/http";
 import { claimNext, completeTask, getTask } from "@/server/tasks/queue";
 import { memDb } from "../../helpers/db";
@@ -70,5 +70,19 @@ describe("bridge browser", () => {
     expect(err).toBeInstanceOf(HttpError);
     expect(err.message).toMatch(/ajudante desligado/);
     expect((db.$client.prepare("select status from tasks").get() as { status: string }).status).toBe("failed");
+  });
+
+  it("login wall → LoginRequiredError pointing to make linkedin-login", async () => {
+    const db = memDb();
+    touchBridge(db, Date.now());
+    const browser = createBridgeBrowser(db, () => Date.now(), { pollMs: 10 });
+    const url = "https://www.linkedin.com/search/results/content/?keywords=dev";
+    const pending = browser.getHtml(url, { waitFor: "[data-urn]", scrolls: 3 }).catch((e) => e);
+    const task = await answer(db, { status: 200, html: null, blocked: false, loginRequired: true });
+    const err = await pending;
+    expect(task.payload).toEqual({ url, waitFor: "[data-urn]", scrolls: 3 });
+    expect(err).toBeInstanceOf(LoginRequiredError);
+    expect(err).toBeInstanceOf(HttpError);
+    expect(err.message).toBe("o LinkedIn pediu login no Chrome do ajudante: rode `make linkedin-login`");
   });
 });

@@ -55,6 +55,7 @@ Abra **http://127.0.0.1:3000** e siga o onboarding.
 | `make bridge` | só o ajudante (se o Docker já estiver de pé); na primeira vez instala o `playwright-core` dele |
 | `make down` | para os containers |
 | `make logs` | logs do app e do worker |
+| `make linkedin-login` | abre o Chrome do ajudante no login do LinkedIn, uma vez (para a fonte "LinkedIn (posts)"); pare o `make bridge` antes |
 
 Seus dados ficam em `./data` (banco SQLite e CV). Para backup, copie essa pasta.
 
@@ -93,8 +94,13 @@ Se pedir login, ele para e avisa.
 | Arbeitnow | Europa | desligada |
 | LinkedIn (endpoint público, **nunca usa seu login**) | global | desligada; pode ser bloqueada |
 | Indeed, Glassdoor (pelo ajudante, num Chrome separado do seu) | Brasil | desligadas; podem ser bloqueadas |
+| LinkedIn (posts), posts de contratação das últimas 24 h (pelo ajudante, **com o seu login**) | global | desligada; ver abaixo |
 
 **Indeed e Glassdoor** recusam qualquer cliente que não seja navegador (desafio do Cloudflare). O ajudante abre a busca no Google Chrome instalado, com um perfil só do app (sem o seu login), minimizado (a janela só pisca ao abrir) e uma página por vez. Se o site pedir verificação, a fonte para e aparece como "limitada": o app não resolve captcha nem disfarça o navegador. Do Glassdoor vem só o resumo de cada vaga, porque a página de detalhes sempre pede verificação. Raspar esses sites vai contra os termos de uso deles, por isso as duas vêm desligadas.
+
+**LinkedIn (posts)** abre a busca de publicações "desenvolvedor" e "contratando" das últimas 24 h no Chrome do ajudante e transforma cada post num card, com o e-mail de contato quando o post tiver um (botão **Enviar e-mail**). Essa busca exige login, então ela usa **a sua conta do LinkedIn**: rode `make linkedin-login` uma vez (com o ajudante parado), entre na janela que abrir e feche o Chrome. O ajudante só lê: uma página por busca, no máximo 3 rolagens, sem clicar, curtir, comentar ou mandar mensagem.
+
+> **Atenção:** automação numa conta logada vai contra os termos de uso do LinkedIn e existe risco de restrição da conta. Use por sua conta e risco; a fonte vem desligada.
 
 **Ficaram de fora:**
 - **NetVagas, Remotar, Catho, Trampos e Coodesh** só montam a lista de vagas via JavaScript.
@@ -102,7 +108,7 @@ Se pedir login, ele para e avisa.
 Regras de boa convivência:
 - poucas requisições por busca, com cache de 6 h nas APIs que pedem isso;
 - crédito e link para a fonte em todo card, como pedem Remotive, Remote OK e Jobicy;
-- nada de login, captcha resolvido ou navegador disfarçado: se o site bloquear, a fonte para.
+- nada de captcha resolvido ou navegador disfarçado: se o site bloquear, a fonte para. O único login é o do LinkedIn (posts), feito por você.
 
 Ligue e desligue as fontes em **Configuração → Fontes de vaga**.
 
@@ -121,6 +127,7 @@ Implemente `JobSource` (`src/server/sources/types.ts`): `search(query, page, htt
 | Fonte "limitada" | o site respondeu 429 ou pediu verificação anti-robô; a próxima busca tenta de novo |
 | Indeed/Glassdoor: `falta o playwright-core no ajudante` | rode `make bridge` (ou `npm --prefix bridge install`) |
 | Indeed/Glassdoor: `não consegui abrir o Google Chrome` | instale o Google Chrome |
+| LinkedIn (posts): `o LinkedIn pediu login no Chrome do ajudante` | pare o ajudante, rode `make linkedin-login`, entre e feche o Chrome; depois `make bridge` |
 | A extensão pede permissão para um site | aprove no Chrome; o ajudante espera até 10 min |
 | Limite do plano do Claude | a análise usa a mesma cota do Claude Code; diminua a busca automática ou defina um teto |
 

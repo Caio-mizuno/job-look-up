@@ -35,7 +35,7 @@ export type RawJob = {
 /** Chrome de verdade no computador da pessoa, via ajudante: para sites que barram requisições simples. */
 export interface PageBrowser {
   /** HTML da página já renderizada; `waitFor` é o seletor que indica que o conteúdo chegou. */
-  getHtml(url: string, opts: { waitFor: string }): Promise<string>;
+  getHtml(url: string, opts: { waitFor: string; scrolls?: number }): Promise<string>;
 }
 
 export type SourceContext = { browser: PageBrowser };

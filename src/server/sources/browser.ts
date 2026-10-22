@@ -9,7 +9,14 @@ import type { PageBrowser, SourceContext } from "./types";
 const PAGE_TIMEOUT_MS = 180_000;
 const OFFLINE = "ajudante desligado: rode `make bridge`";
 
-type BrowserFetchResult = { status: number; html: string | null; blocked: boolean };
+type BrowserFetchResult = { status: number; html: string | null; blocked: boolean; loginRequired?: boolean };
+
+/** Sessão do LinkedIn ausente ou expirada no perfil do ajudante: só a pessoa resolve, logando de novo. */
+export class LoginRequiredError extends HttpError {
+  constructor() {
+    super("o LinkedIn pediu login no Chrome do ajudante: rode `make linkedin-login`");
+  }
+}
 
 /** Abre a página no Chrome do computador da pessoa pelo ajudante (ver bridge/browser.mjs). */
 export function createBridgeBrowser(
@@ -18,9 +25,10 @@ export function createBridgeBrowser(
   opts: { timeoutMs?: number; pollMs?: number } = {},
 ): PageBrowser {
   return {
-    async getHtml(url, { waitFor }) {
+    async getHtml(url, { waitFor, scrolls }) {
       if (!isBridgeOnline(db, now())) throw new HttpError(OFFLINE);
-      const id = enqueue(db, { type: "browser_fetch", runner: "bridge", payload: { url, waitFor } });
+      const payload = scrolls ? { url, waitFor, scrolls } : { url, waitFor };
+      const id = enqueue(db, { type: "browser_fetch", runner: "bridge", payload });
       const timeoutMs = opts.timeoutMs ?? PAGE_TIMEOUT_MS;
       let res: BrowserFetchResult;
       try {
@@ -37,6 +45,7 @@ export function createBridgeBrowser(
         db.$client.prepare("update tasks set result = null where id = ?").run(id);
       }
       // Sem resolver captcha: se o site pede verificação, a fonte para nesta rodada.
+      if (res.loginRequired) throw new LoginRequiredError();
       if (res.blocked) throw new RateLimitedError("bloqueada pela verificação anti-robô do site");
       if (res.status >= 400 || !res.html) throw new HttpError(`HTTP ${res.status}`, res.status);
       return res.html;

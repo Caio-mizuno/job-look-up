@@ -2,11 +2,23 @@ import { describe, expect, it } from "vitest";
 import { createBrowserRunner, minimizeWindow } from "./browser.mjs";
 
 /** Chrome falso com a mesma forma do contexto do Playwright usada pelo executor. */
-function fakeChrome({ title = "Vagas | Indeed", found = true, html = "<html>vagas</html>", statuses = [200] } = {}) {
+function fakeChrome({ title = "Vagas | Indeed", found = true, html = "<html>vagas</html>", statuses = [200], finalUrl = null } = {}) {
   const frame = {};
   const listeners = new Map();
   const page = {
     visited: [],
+    scrolls: 0,
+    waits: [],
+    selectorWaits: 0,
+    url() {
+      return finalUrl ?? this.visited[this.visited.length - 1] ?? "about:blank";
+    },
+    async evaluate() {
+      this.scrolls++;
+    },
+    async waitForTimeout(ms) {
+      this.waits.push(ms);
+    },
     on: (ev, fn) => listeners.set(ev, fn),
     off: (ev) => listeners.delete(ev),
     mainFrame: () => frame,
@@ -18,6 +30,7 @@ function fakeChrome({ title = "Vagas | Indeed", found = true, html = "<html>vaga
       }
     },
     async waitForSelector() {
+      this.selectorWaits++;
       if (!found) throw new Error("timeout");
     },
     title: async () => title,
@@ -108,6 +121,55 @@ describe("browser runner", () => {
     fail = false;
     await expect(runner.run(payload)).resolves.toMatchObject({ blocked: false });
     await runner.close();
+  });
+});
+
+describe("browser runner on linkedin", () => {
+  const posts = {
+    url: "https://www.linkedin.com/search/results/content/?keywords=%22desenvolvedor%22&datePosted=%5B%22past-24h%22%5D",
+    waitFor: '[data-urn^="urn:li:activity:"]',
+  };
+
+  it("accepts linkedin and still refuses other hosts", async () => {
+    const chrome = fakeChrome({ html: "<html>posts</html>" });
+    const runner = createBrowserRunner({ profileDir: "/tmp/x", launch: chrome.launch });
+    await expect(runner.run(posts)).resolves.toEqual({ status: 200, html: "<html>posts</html>", blocked: false });
+    await expect(runner.run({ ...posts, url: "https://evil.com/" })).rejects.toThrow(/não permitido/);
+    await runner.close();
+  });
+
+  it("scrolls the requested times, waiting 1500 ms each, capped at 3", async () => {
+    const chrome = fakeChrome();
+    const runner = createBrowserRunner({ profileDir: "/tmp/x", launch: chrome.launch });
+    await runner.run({ ...posts, scrolls: 3 });
+    expect(chrome.page.scrolls).toBe(3);
+    expect(chrome.page.waits).toEqual([1500, 1500, 1500]);
+    await runner.run({ ...posts, scrolls: 9 });
+    expect(chrome.page.scrolls).toBe(6);
+    await runner.run(posts);
+    expect(chrome.page.scrolls).toBe(6);
+    await runner.close();
+  });
+
+  it("reports loginRequired on the login wall without waiting for the selector", async () => {
+    for (const finalUrl of [
+      "https://www.linkedin.com/authwall?trk=x",
+      "https://www.linkedin.com/login?session_redirect=y",
+      "https://www.linkedin.com/checkpoint/challenge/abc",
+      "https://www.linkedin.com/uas/login?x=1",
+    ]) {
+      const chrome = fakeChrome({ finalUrl });
+      const runner = createBrowserRunner({ profileDir: "/tmp/x", launch: chrome.launch });
+      await expect(runner.run({ ...posts, scrolls: 3 })).resolves.toEqual({
+        status: 200,
+        html: null,
+        blocked: false,
+        loginRequired: true,
+      });
+      expect(chrome.page.selectorWaits).toBe(0);
+      expect(chrome.page.scrolls).toBe(0);
+      await runner.close();
+    }
   });
 });
 
