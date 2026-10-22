@@ -156,7 +156,7 @@ describe("enrich handler", () => {
     const db = memDb();
     saveProfile(db, sampleProfile(), NOW);
     const a = addJob(db, 1);
-    const id = enqueue(db, { type: "enrich", payload: { jobIds: [a] } });
+    const id = enqueue(db, { type: "enrich", payload: { jobIds: [a] }, runAt: NOW });
     const task = claimNext(db, { runner: "worker", now: NOW })!;
     await expect(enrichHandler(task, { db, now: () => NOW })).resolves.toEqual({ deferred: true });
     expect(getTask(db, id)).toMatchObject({ status: "queued", attempts: 0, runAt: NOW + 60_000 });
