@@ -15,6 +15,13 @@
       "when": 1792683629809,
       "tag": "0001_sweet_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1792683786135,
+      "tag": "0002_nasty_iron_lad",
+      "breakpoints": true
     }
   ]
 }

@@ -102,6 +102,24 @@ export const applications = sqliteTable("applications", {
   finishedAt: integer(),
 });
 
+/** Histórico do "Enviar e-mail": uma linha por tentativa; só uma `sent` por vaga. */
+export const outreachEmails = sqliteTable(
+  "outreach_emails",
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    jobId: integer()
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    toEmail: text().notNull(),
+    subject: text().notNull(),
+    body: text().notNull(),
+    status: text().$type<"sent" | "failed">().notNull(),
+    error: text(),
+    createdAt: integer().notNull(),
+  },
+  (t) => [index("outreach_emails_job_idx").on(t.jobId)],
+);
+
 export type TaskStatus = "queued" | "running" | "done" | "failed";
 export type TaskRunner = "worker" | "bridge";
 
