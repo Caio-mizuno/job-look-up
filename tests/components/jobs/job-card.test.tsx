@@ -24,6 +24,8 @@ const item = (over: Partial<JobListItem> = {}): JobListItem => ({
   enrichment: null,
   application: null,
   analysisError: null,
+  contactEmail: null,
+  emailSentAt: null,
   ...over,
 });
 

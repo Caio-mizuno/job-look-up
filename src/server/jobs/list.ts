@@ -38,6 +38,9 @@ export type JobListItem = {
   enrichment: (Omit<Enrichment, "jobId"> & { stale: boolean }) | null;
   application: { id: number; status: ApplicationStatus } | null;
   analysisError: string | null;
+  /** Posts do LinkedIn: e-mail achado no texto e quando o "Enviar e-mail" deu certo. */
+  contactEmail: string | null;
+  emailSentAt: number | null;
 };
 
 type Row = {
@@ -55,6 +58,8 @@ type Row = {
   status: JobStatus;
   first_seen_at: number;
   analysis_error: string | null;
+  contact_email: string | null;
+  email_sent_at: number | null;
   e_score: number | null;
   e_data: string | null;
   e_version: string | null;
@@ -109,7 +114,8 @@ export function listJobs(
   const rows = db.$client
     .prepare(
       `select j.id, j.title, j.company, j.location, j.work_model, j.contract, j.seniority, j.salary_text, j.posted_at,
-              j.source, j.url, j.status, j.first_seen_at, j.analysis_error,
+              j.source, j.url, j.status, j.first_seen_at, j.analysis_error, j.contact_email,
+              (select max(o.created_at) from outreach_emails o where o.job_id = j.id and o.status = 'sent') email_sent_at,
               e.match_score e_score, e.data e_data, e.profile_version e_version,
               exists (
                 select 1 from tasks t, json_each(t.payload, '$.jobIds') ids
@@ -166,6 +172,8 @@ function toItem(r: Row, ctx: { profileVersion: string | null; lastVisitAt: numbe
         : null,
     application: r.app_id !== null && r.app_status ? { id: r.app_id, status: r.app_status } : null,
     analysisError: r.analysis_error,
+    contactEmail: r.contact_email,
+    emailSentAt: r.email_sent_at,
   };
 }
 

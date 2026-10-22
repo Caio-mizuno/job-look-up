@@ -8,6 +8,7 @@ export const SHELL_COPY = {
     applications: "Candidaturas",
     sources: "Fontes de vaga",
     ai: "IA",
+    email: "E-mail",
     bridge: "Ajudante",
   },
   bridge: {
@@ -23,5 +24,6 @@ export const PAGE_TITLES: Record<string, string> = {
   "/candidaturas": SHELL_COPY.nav.applications,
   "/config/fontes": SHELL_COPY.nav.sources,
   "/config/ia": SHELL_COPY.nav.ai,
+  "/config/email": SHELL_COPY.nav.email,
   "/config/ajudante": SHELL_COPY.nav.bridge,
 };

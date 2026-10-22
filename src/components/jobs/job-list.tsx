@@ -2,11 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
-import { applyToJob, applyToJobs, clearDiscardedCache, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
+import {
+  applyToJob,
+  applyToJobs,
+  clearDiscardedCache,
+  discardJob,
+  loadOutreachDraft,
+  markSeen,
+  recalcJob,
+  restoreJob,
+  sendOutreach,
+} from "@/app/(app)/vagas/actions";
 import { startSearch } from "@/app/(app)/vagas/search-actions";
 import { ApplicationKit } from "@/components/applications/application-kit";
 import { ApplyButton } from "@/components/applications/apply-button";
 import { APPLY_COPY } from "@/components/applications/copy";
+import { EmailButton } from "@/components/outreach/email-button";
+import { OutreachDialog } from "@/components/outreach/outreach-dialog";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -68,6 +80,7 @@ export function JobList({
   const compact = compactOverride ?? storedCompact;
   const [searchRequested, setSearchRequested] = useState(false);
   const [kitJobId, setKitJobId] = useState<number | null>(null);
+  const [emailJobId, setEmailJobId] = useState<number | null>(null);
   const [discardedCount, setDiscardedCount] = useState(initialDiscarded);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
@@ -271,18 +284,31 @@ export function JobList({
               void recalcJob(id).then(() => reload(filters, true));
             }}
             actions={
-              <ApplyButton
-                url={job.url}
-                application={job.application}
-                onApply={() => void onApply(job)}
-                onOpenKit={() => setKitJobId(job.id)}
-              />
+              // Post do LinkedIn não tem formulário: o contato é por e-mail.
+              job.source === "linkedin_posts" ? (
+                <EmailButton contactEmail={job.contactEmail} sentAt={job.emailSentAt} onOpen={() => setEmailJobId(job.id)} />
+              ) : (
+                <ApplyButton
+                  url={job.url}
+                  application={job.application}
+                  onApply={() => void onApply(job)}
+                  onOpenKit={() => setKitJobId(job.id)}
+                />
+              )
             }
           />
         ))}
       </div>
       <div ref={sentinel} aria-hidden />
       <ApplicationKit jobId={kitJobId} open={kitJobId !== null} onOpenChange={(v) => !v && setKitJobId(null)} />
+      <OutreachDialog
+        jobId={emailJobId}
+        open={emailJobId !== null}
+        onOpenChange={(v) => !v && setEmailJobId(null)}
+        load={loadOutreachDraft}
+        send={sendOutreach}
+        onSent={() => void reload(filters, true)}
+      />
       {loading && <Skeleton className="h-24 w-full" />}
     </div>
   );

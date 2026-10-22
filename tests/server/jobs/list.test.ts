@@ -46,6 +46,23 @@ function enrich(db: Db, jobId: number, score: number, version = "v1", createdAt 
 const ctx = { profileVersion: "v1", lastVisitAt: 0, now: NOW };
 
 describe("listJobs", () => {
+  it("brings the post contact e-mail and when the e-mail was sent", () => {
+    const db = memDb();
+    const a = job(db, 1, { contact_email: "rh@x.com" });
+    const b = job(db, 2, { contact_email: "rh@y.com" });
+    const c = job(db, 3);
+    const add = db.$client.prepare(
+      "insert into outreach_emails (job_id, to_email, subject, body, status, error, created_at) values (?, ?, 's', 'b', ?, ?, ?)",
+    );
+    add.run(a, "rh@x.com", "failed", "erro", NOW - 10);
+    add.run(a, "rh@x.com", "sent", null, NOW - 5);
+    add.run(b, "rh@y.com", "failed", "erro", NOW - 5);
+    const byId = Object.fromEntries(listJobs(db, { sort: "recent" }, ctx).items.map((j) => [j.id, j]));
+    expect(byId[a]).toMatchObject({ contactEmail: "rh@x.com", emailSentAt: NOW - 5 });
+    expect(byId[b]).toMatchObject({ contactEmail: "rh@y.com", emailSentAt: null });
+    expect(byId[c]).toMatchObject({ contactEmail: null, emailSentAt: null });
+  });
+
   it("excludes discarded and filters workModels", () => {
     const db = memDb();
     job(db, 1);

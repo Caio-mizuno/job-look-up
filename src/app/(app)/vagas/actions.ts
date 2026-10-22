@@ -1,9 +1,12 @@
 "use server";
 
+import { z } from "zod";
 import { buildCompanyMessage } from "@/server/applications/message";
 import { applyJobs, queueApplication } from "@/server/applications/repo";
 import { getDb } from "@/server/db/client";
 import { restoreDiscarded, setJobStatus } from "@/server/jobs/list";
+import { getMailConfig } from "@/server/outreach/config";
+import { getOutreachDraft, sendOutreachEmail, type OutreachDraft, type SendResult } from "@/server/outreach/send";
 import { getProfile } from "@/server/profile/repo";
 import { enqueue } from "@/server/tasks/queue";
 
@@ -99,4 +102,25 @@ export async function getKitData(jobId: number): Promise<KitData | null> {
       linkedin: p?.personal.linkedin ?? "",
     }),
   };
+}
+
+/** Rascunho do diálogo "Enviar e-mail" (posts do LinkedIn) e se o SMTP está configurado. */
+export async function loadOutreachDraft(
+  jobId: number,
+): Promise<{ draft: OutreachDraft; cvFilename: string | null; sentAt: number | null; configured: boolean } | null> {
+  const res = getOutreachDraft(getDb(), jobId);
+  return res ? { ...res, configured: getMailConfig() !== null } : null;
+}
+
+const DraftInput = z.object({
+  to: z.string().trim().max(320),
+  subject: z.string().trim().min(1).max(300),
+  body: z.string().trim().min(1).max(10_000),
+});
+
+/** Envia o e-mail revisado no diálogo. Só roda pelo clique em "Enviar". */
+export async function sendOutreach(jobId: number, draft: OutreachDraft): Promise<SendResult> {
+  const parsed = DraftInput.safeParse(draft);
+  if (!Number.isInteger(jobId) || !parsed.success) return { ok: false, error: "invalid_to" };
+  return sendOutreachEmail(getDb(), jobId, parsed.data, { config: getMailConfig(), now: Date.now() });
 }

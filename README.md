@@ -85,6 +85,19 @@ Se pedir login, ele para e avisa.
 
 **LinkedIn é só manual:** para vagas do LinkedIn existe o **Kit de candidatura**, com tudo pronto para copiar. Automação ali pode bloquear a sua conta.
 
+## E-mail para posts do LinkedIn
+
+Nos cards da fonte **LinkedIn (posts)**, o botão **Enviar e-mail** abre um rascunho com uma mensagem calorosa: quem você é, que está buscando uma nova oportunidade, seu **currículo em anexo**, seu **LinkedIn** e seu **portfólio** (os links do seu perfil). Você confere, ajusta e só então clica em **Enviar**. Nada sai sozinho, nem em lote. Cada vaga recebe no máximo um e-mail.
+
+O envio sai da sua conta do Gmail, por SMTP com **senha de app**:
+
+1. Ative a verificação em 2 etapas na sua Conta Google.
+2. Crie uma senha de app em https://myaccount.google.com/apppasswords.
+3. No arquivo `.env`, preencha `SMTP_USER` (seu Gmail) e `SMTP_PASS` (a senha de app). `make setup` cria as chaves se faltarem.
+4. Rode `docker compose up -d` para o app ler o `.env` de novo.
+
+Em **Configuração → E-mail** dá para mandar um e-mail de teste para você mesmo. A senha fica só no `.env`: nunca vai para o banco, para a tela ou para os logs.
+
 ## Fontes de vaga
 
 | Fonte | Tipo | Padrão |
