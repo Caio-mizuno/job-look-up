@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
-import { applyToJob, clearDiscardedCache, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
+import { applyToJob, applyToJobs, clearDiscardedCache, discardJob, markSeen, recalcJob, restoreJob } from "@/app/(app)/vagas/actions";
 import { startSearch } from "@/app/(app)/vagas/search-actions";
 import { ApplicationKit } from "@/components/applications/application-kit";
 import { ApplyButton } from "@/components/applications/apply-button";
@@ -10,8 +10,10 @@ import { APPLY_COPY } from "@/components/applications/copy";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { BULK_APPLY_MAX, canBulkApply } from "@/lib/bulk-apply";
 import { useAppStatus } from "@/lib/use-app-status";
 import type { JobListItem } from "@/server/jobs/list";
+import { BulkApplyBar } from "./bulk-apply-bar";
 import { JOBS_COPY as C } from "./copy";
 import { DiscardedCache } from "./discarded-cache";
 import { JobCard } from "./job-card";
@@ -67,6 +69,8 @@ export function JobList({
   const [searchRequested, setSearchRequested] = useState(false);
   const [kitJobId, setKitJobId] = useState<number | null>(null);
   const [discardedCount, setDiscardedCount] = useState(initialDiscarded);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
   const sentinel = useRef<HTMLDivElement>(null);
   const loadedCount = useRef(initialItems.length);
   useEffect(() => {
@@ -167,6 +171,32 @@ export function JobList({
     void reload(filters);
   };
 
+  // Seleção efetiva = marcadas que ainda são elegíveis: vaga que entrou na fila ou sumiu da lista sai sozinha.
+  const eligibleIds = useMemo(() => items.filter(canBulkApply).map((j) => j.id), [items]);
+  const selectedIds = eligibleIds.filter((id) => selected.has(id));
+
+  const toggleOne = (id: number, on: boolean) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+
+  const onBulkApply = async () => {
+    if (selectedIds.length === 0) return;
+    setBulkBusy(true);
+    try {
+      if (!status?.bridgeOnline) toast.warning(C.bulk.bridgeOff);
+      const res = await applyToJobs(selectedIds);
+      toast.success(C.bulk.queued(res.queued.length, res.skipped.length));
+      setSelected(new Set());
+      void reload(filters, true);
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
   const onSearch = async () => {
     setSearchRequested(true);
     await startSearch();
@@ -217,6 +247,15 @@ export function JobList({
         </Empty>
       )}
 
+      <BulkApplyBar
+        eligibleCount={eligibleIds.length}
+        selectedCount={selectedIds.length}
+        onToggleAll={(all) => setSelected(new Set(all ? eligibleIds.slice(0, BULK_APPLY_MAX) : []))}
+        onApply={() => void onBulkApply()}
+        onClear={() => setSelected(new Set())}
+        busy={bulkBusy}
+      />
+
       <div className="flex flex-col gap-3">
         {items.map((job) => (
           <JobCard
@@ -224,6 +263,8 @@ export function JobList({
             job={job}
             bridgeOnline={status?.bridgeOnline ?? false}
             compact={compact}
+            selected={selected.has(job.id)}
+            onSelectedChange={canBulkApply(job) ? (v) => toggleOne(job.id, v) : undefined}
             onOpen={(id) => void markSeen(id)}
             onDiscard={(id) => void onDiscard(id)}
             onRecalc={(id) => {

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { safeHttpUrl } from "@/lib/safe-url";
 import type { JobListItem } from "@/server/jobs/list";
 import { JOBS_COPY as C } from "./copy";
@@ -22,6 +23,9 @@ export type JobCardProps = {
   /** Ações extras (candidatura, kit) entram aqui sem o card conhecer o fluxo. */
   actions?: React.ReactNode;
   hint?: React.ReactNode;
+  /** Seleção do lote: o checkbox só aparece nas vagas que podem entrar no "Quero participar" em lote. */
+  selected?: boolean;
+  onSelectedChange?: (v: boolean) => void;
 };
 
 function Column({ title, items }: { title: string; items: React.ReactNode[] }) {
@@ -41,7 +45,18 @@ function Column({ title, items }: { title: string; items: React.ReactNode[] }) {
   );
 }
 
-export function JobCard({ job, bridgeOnline, compact, onOpen, onDiscard, onRecalc, actions, hint }: JobCardProps) {
+export function JobCard({
+  job,
+  bridgeOnline,
+  compact,
+  onOpen,
+  onDiscard,
+  onRecalc,
+  actions,
+  hint,
+  selected,
+  onSelectedChange,
+}: JobCardProps) {
   const href = safeHttpUrl(job.url);
   const sourceHref = safeHttpUrl(job.sourceHomepage);
   const e = job.enrichment;
@@ -59,6 +74,14 @@ export function JobCard({ job, bridgeOnline, compact, onOpen, onDiscard, onRecal
   return (
     <Card className="gap-0 px-4 py-4 transition-shadow hover:shadow-md sm:px-5">
       <div className="flex flex-wrap items-start gap-3">
+        {onSelectedChange && (
+          <Checkbox
+            className="mt-1"
+            checked={selected ?? false}
+            onCheckedChange={(v) => onSelectedChange(v === true)}
+            aria-label={C.bulk.selectOne(job.title)}
+          />
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-[15px] font-semibold leading-snug tracking-tight">{job.title}</h3>

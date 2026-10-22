@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { JobCard } from "@/components/jobs/job-card";
 import type { JobListItem } from "@/server/jobs/list";
@@ -47,6 +47,18 @@ const enrichment = {
 const handlers = { onOpen: vi.fn(), onDiscard: vi.fn(), onRecalc: vi.fn() };
 
 describe("JobCard", () => {
+  it("shows a selection checkbox only when selectable", () => {
+    const onSelectedChange = vi.fn();
+    const { rerender } = render(<JobCard job={item()} bridgeOnline compact={false} {...handlers} />);
+    expect(screen.queryByRole("checkbox")).toBeNull();
+
+    rerender(
+      <JobCard job={item()} bridgeOnline compact={false} {...handlers} selected={false} onSelectedChange={onSelectedChange} />,
+    );
+    fireEvent.click(screen.getByRole("checkbox", { name: "Selecionar Desenvolvedor Laravel" }));
+    expect(onSelectedChange).toHaveBeenCalledWith(true);
+  });
+
   it("renders fallbacks for null company/salary", () => {
     render(<JobCard job={item()} bridgeOnline compact={false} {...handlers} />);
     expect(screen.getByText("Empresa não informada")).toBeInTheDocument();

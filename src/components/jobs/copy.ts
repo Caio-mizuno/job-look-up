@@ -25,6 +25,14 @@ export const JOBS_COPY = {
   posted: (date: string) => `publicada em ${date}`,
   match: (n: number) => `${n}%`,
   compact: "Modo compacto",
+  bulk: {
+    selectAll: (n: number) => `Selecionar todas (${n})`,
+    selectOne: (title: string) => `Selecionar ${title}`,
+    apply: (n: number) => `Quero participar (${n})`,
+    clear: "Limpar seleção",
+    queued: (q: number, s: number) => (s > 0 ? `${q} na fila · ${s} puladas` : `${q} na fila`),
+    bridgeOff: "Ajudante desligado: as candidaturas começam quando você rodar `make bridge`.",
+  },
   discardedCache: {
     button: (n: number) => `Descartadas: ${n} · Limpar cache`,
     title: "Limpar o cache de descartadas?",
