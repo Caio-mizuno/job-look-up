@@ -6,6 +6,7 @@ import { indeedSource } from "./indeed";
 import { infojobsSource } from "./infojobs";
 import { jobicySource } from "./jobicy";
 import { linkedinSource } from "./linkedin";
+import { linkedinPostsSource } from "./linkedin-posts";
 import { programathorSource } from "./programathor";
 import { remoteokSource } from "./remoteok";
 import { remotiveSource } from "./remotive";
@@ -30,6 +31,7 @@ export const SOURCES: JobSource[] = [
   linkedinSource,
   indeedSource,
   glassdoorSource,
+  linkedinPostsSource,
 ];
 
 export function getSource(id: SourceId | string): JobSource | undefined {

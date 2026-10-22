@@ -1,0 +1,1 @@
+ALTER TABLE `jobs` ADD `contact_email` text;

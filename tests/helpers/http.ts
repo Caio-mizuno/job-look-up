@@ -20,11 +20,13 @@ export function fixtureHttp(routes: [RegExp, string][]): Http & { urls: string[]
 }
 
 /** Navegador do ajudante falso: responde por padrão de URL; registra as páginas pedidas. */
-export function fixtureBrowser(routes: [RegExp, string][]): SourceContext & { calls: { url: string; waitFor: string }[] } {
-  const calls: { url: string; waitFor: string }[] = [];
+export function fixtureBrowser(
+  routes: [RegExp, string][],
+): SourceContext & { calls: { url: string; waitFor: string; scrolls?: number }[] } {
+  const calls: { url: string; waitFor: string; scrolls?: number }[] = [];
   const browser: PageBrowser = {
-    async getHtml(url, { waitFor }) {
-      calls.push({ url, waitFor });
+    async getHtml(url, { waitFor, scrolls }) {
+      calls.push(scrolls ? { url, waitFor, scrolls } : { url, waitFor });
       const hit = routes.find(([re]) => re.test(url));
       if (!hit) throw new Error(`sem fixture para ${url}`);
       return hit[1];

@@ -14,6 +14,7 @@ export const SOURCE_LABELS: Record<SourceId, string> = {
   jobicy: "Jobicy",
   arbeitnow: "Arbeitnow",
   linkedin: "LinkedIn",
+  linkedin_posts: "LinkedIn (posts)",
   indeed: "Indeed",
   glassdoor: "Glassdoor",
 };

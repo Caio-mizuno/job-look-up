@@ -7,6 +7,8 @@ export const SOURCES_COPY = {
     linkedin: "Pode ser bloqueada pelo LinkedIn. Nunca usa seu login.",
     indeed: "O site barra acesso direto: o ajudante abre a busca num Chrome separado do seu (sem seu login). Pode ser bloqueada pelo Indeed.",
     glassdoor: "O site barra acesso direto: o ajudante abre a busca num Chrome separado do seu (sem seu login). Traz só o resumo de cada vaga.",
+    linkedin_posts:
+      "Posts de contratação das últimas 24 h. Usa a SUA conta do LinkedIn no Chrome do ajudante (rode `make linkedin-login` uma vez): vai contra os termos do LinkedIn, há risco de restrição da conta.",
     arbeitnow: "Foco em vagas da Europa.",
     remotive: "Vagas com 24 h de atraso; o app consulta no máximo 4 vezes por dia, como pedem os termos.",
   } as Record<string, string>,

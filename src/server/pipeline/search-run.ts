@@ -125,7 +125,7 @@ export async function runSearch(
   const saved = listQueries(db).filter((q) => isUsableKeywords(q.keywords));
   const queries = saved.length > 0 ? saved : profile ? fallbackQueries(profile.data) : [];
 
-  await Promise.all(sources.map((s) => searchSource(db, opts.runId, s, queries, http, ctx, now)));
+  await Promise.all(sources.map((s) => searchSource(db, opts.runId, s, s.fixedQueries ?? queries, http, ctx, now)));
 
   if (profile) {
     const candidates = (

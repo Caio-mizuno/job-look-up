@@ -66,8 +66,8 @@ describe("arbeitnow", () => {
 });
 
 describe("registry", () => {
-  it("has 14 sources; LinkedIn, Arbeitnow, Indeed and Glassdoor off by default", () => {
-    expect(SOURCES).toHaveLength(14);
+  it("has 15 sources; LinkedIn, LinkedIn posts, Arbeitnow, Indeed and Glassdoor off by default", () => {
+    expect(SOURCES).toHaveLength(15);
     expect(SOURCES.filter((s) => s.defaultEnabled).map((s) => s.id)).toEqual([
       "gupy",
       "programathor",

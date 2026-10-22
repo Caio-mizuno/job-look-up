@@ -18,6 +18,7 @@ export function upsertJob(db: Db, job: NewJob, now: number): { id: number; inser
            seniority = coalesce(seniority, ?),
            salary_text = coalesce(salary_text, ?),
            posted_at = coalesce(posted_at, ?),
+           contact_email = coalesce(contact_email, ?),
            description_text = case when length(coalesce(description_text, '')) < length(coalesce(?, ''))
                                    then ? else description_text end
          where id = ?`,
@@ -31,6 +32,7 @@ export function upsertJob(db: Db, job: NewJob, now: number): { id: number; inser
         job.seniority,
         job.salaryText,
         job.postedAt,
+        job.contactEmail,
         job.descriptionText,
         job.descriptionText,
         existing.id,
@@ -40,8 +42,8 @@ export function upsertJob(db: Db, job: NewJob, now: number): { id: number; inser
   const res = db.$client
     .prepare(
       `insert into jobs (source, source_job_id, url, dedupe_key, title, company, location, work_model, contract, seniority,
-                         salary_text, posted_at, description_text, first_seen_at, last_seen_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                         salary_text, posted_at, description_text, contact_email, first_seen_at, last_seen_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       job.source,
@@ -57,6 +59,7 @@ export function upsertJob(db: Db, job: NewJob, now: number): { id: number; inser
       job.salaryText,
       job.postedAt,
       job.descriptionText,
+      job.contactEmail,
       now,
       now,
     );

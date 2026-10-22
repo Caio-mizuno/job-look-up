@@ -1,0 +1,76 @@
+<!-- SINTÉTICA (Task 7): marcação do DOM conhecido da busca de conteúdo do LinkedIn, dados fictícios.
+     Trocar por captura real anonimizada na Task 6 (make linkedin-login + captura).
+     POST_SELECTOR: [data-urn^="urn:li:activity:"] | TEXT: .update-components-text | AUTHOR: .update-components-actor__title span[aria-hidden="true"] -->
+<!DOCTYPE html>
+<html lang="pt">
+<head><title>Pesquisa | LinkedIn</title></head>
+<body>
+<main class="scaffold-layout__main">
+  <div class="search-results-container">
+    <ul role="list" class="reusable-search__entity-result-list">
+      <li class="artdeco-card mb2">
+        <div class="feed-shared-update-v2 feed-shared-update-v2--minimal-padding" data-urn="urn:li:activity:7518974430412812345" role="article">
+          <div class="update-components-actor display-flex">
+            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-a">
+              <span class="update-components-actor__title">
+                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora A<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora A<!----></span></span>
+              </span>
+              <span class="update-components-actor__description"><span aria-hidden="true">Tech Recruiter na Exemplo</span></span>
+              <span class="update-components-actor__sub-description"><span aria-hidden="true">2 h • </span></span>
+            </a>
+          </div>
+          <div class="feed-shared-update-v2__description-wrapper">
+            <div class="feed-shared-inline-show-more-text">
+              <div class="update-components-text relative update-components-update-v2__commentary" dir="ltr">
+                <span class="break-words tvm-parent-container"><span dir="ltr">Estamos contratando!<br><br>Vaga: Desenvolvedor PHP Pleno (remoto)<br>Stack: PHP 8, Laravel, MySQL.<br>Envie seu CV para vagas@exemplo.com.br.</span></span>
+              </div>
+              <button class="feed-shared-inline-show-more-text__see-more-less-toggle" aria-label="ver mais">…ver mais</button>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="artdeco-card mb2">
+        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518951781171212345" role="article">
+          <div class="update-components-actor display-flex">
+            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-b">
+              <span class="update-components-actor__title">
+                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora B<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora B<!----></span></span>
+              </span>
+              <span class="update-components-actor__description"><span aria-hidden="true">Head de Engenharia</span></span>
+            </a>
+          </div>
+          <div class="feed-shared-update-v2__description-wrapper">
+            <div class="update-components-text relative" dir="ltr">
+              <span class="break-words"><span dir="ltr">Procuramos dev React sênior, híbrido em SP. Me chama no direct!</span></span>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="artdeco-card mb2">
+        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518797011353612345" role="article">
+          <div class="update-components-actor display-flex">
+            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-c">
+              <span class="update-components-actor__title">
+                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora C<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora C<!----></span></span>
+              </span>
+            </a>
+          </div>
+          <div class="feed-shared-update-v2__description-wrapper">
+            <div class="update-components-text relative" dir="ltr">
+              <span class="break-words"><span dir="ltr">#contratando<br>Desenvolvedora Full Stack (Node e React), CLT, 100% remoto.<br>Não responda para noreply@exemplo.com.<br>Currículos: RH@Exemplo.com ou talentos@exemplo.com</span></span>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="artdeco-card mb2">
+        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518797011353699999" role="article">
+          <div class="update-components-actor display-flex">
+            <span class="update-components-actor__title"><span aria-hidden="true">Post sem texto</span></span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

@@ -53,6 +53,7 @@ export const jobs = sqliteTable(
     localScore: real().notNull().default(0),
     status: text().$type<JobStatus>().notNull().default("new"),
     analysisError: text(),
+    contactEmail: text(),
     firstSeenAt: integer().notNull(),
     lastSeenAt: integer().notNull(),
     seenAt: integer(),

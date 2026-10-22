@@ -84,6 +84,7 @@ export type NewJob = {
   salaryText: string | null;
   postedAt: number | null;
   descriptionText: string | null;
+  contactEmail: string | null;
 };
 
 export function normalizeRawJob(raw: RawJob, _now: number): NewJob {
@@ -105,5 +106,6 @@ export function normalizeRawJob(raw: RawJob, _now: number): NewJob {
     salaryText: raw.salaryText?.trim() || null,
     postedAt: raw.postedAt && !Number.isNaN(raw.postedAt.getTime()) ? raw.postedAt.getTime() : null,
     descriptionText: raw.descriptionText?.trim() || null,
+    contactEmail: raw.contactEmail?.trim().toLowerCase() || null,
   };
 }

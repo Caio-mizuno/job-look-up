@@ -13,6 +13,7 @@ export type SourceId =
   | "jobicy"
   | "arbeitnow"
   | "linkedin"
+  | "linkedin_posts"
   | "indeed"
   | "glassdoor";
 
@@ -30,6 +31,8 @@ export type RawJob = {
   salaryText: string | null;
   postedAt: Date | null;
   descriptionText: string | null;
+  /** E-mail de contato achado no texto (posts do LinkedIn): habilita o "Enviar e-mail" no card. */
+  contactEmail?: string | null;
 };
 
 /** Chrome de verdade no computador da pessoa, via ajudante: para sites que barram requisições simples. */
@@ -47,6 +50,8 @@ export interface JobSource {
   homepage: string;
   defaultEnabled: boolean;
   maxPages: number;
+  /** Consultas próprias da fonte: a rodada usa estas e ignora as do perfil. */
+  fixedQueries?: SearchQuery[];
   cacheTtlMs?: number;
   userAgent?: string;
   search(q: SearchQuery, page: number, http: Http, ctx?: SourceContext): Promise<RawJob[]>;
