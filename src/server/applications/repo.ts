@@ -3,6 +3,7 @@ import type { ApplicationStatus } from "@/server/db/schema";
 import { getProfile, saveProfile } from "@/server/profile/repo";
 import { enqueue } from "@/server/tasks/queue";
 import { isAutoApplyAllowed } from "@/lib/apply-url";
+import { BULK_APPLY_MAX, type BulkSkipReason } from "@/lib/bulk-apply";
 import type { ApplyEvent, ApplyReport, Drafts, ExtraAnswer } from "./schema";
 
 const MAX_EVENTS = 500;
@@ -76,6 +77,50 @@ export function createApplication(db: Db, jobId: number, now: number): { id: num
   db.$client.prepare("update jobs set status = 'interested' where id = ? and status not in ('applied')").run(jobId);
   linkPrepareTask(db, id);
   return { id };
+}
+
+/** "Quero participar": repete a última candidatura que falhou/pediu login ou cria uma nova. */
+export function queueApplication(db: Db, jobId: number, now: number): { ok: true; id: number } | { ok: false; error: "linkedin" | "not_found" } {
+  const last = db.$client
+    .prepare("select id from applications where job_id = ? and status in ('failed', 'login_required') order by id desc limit 1")
+    .get(jobId) as { id: number } | undefined;
+  if (last) {
+    retryApplication(db, last.id, now);
+    return { ok: true, id: last.id };
+  }
+  const res = createApplication(db, jobId, now);
+  return "id" in res ? { ok: true, id: res.id } : { ok: false, error: res.error };
+}
+
+/** Status em que a vaga já tem candidatura viva ou concluída: o lote não cria outra. */
+const ACTIVE = new Set<ApplicationStatus>(["queued", "running", "needs_review", "submitted"]);
+
+/** Lote do "Quero participar": cada vaga segue o mesmo caminho do botão individual. */
+export function applyJobs(
+  db: Db,
+  jobIds: number[],
+  now: number,
+): { queued: number[]; skipped: { jobId: number; reason: BulkSkipReason }[] } {
+  const unique = [...new Set(jobIds)];
+  const queued: number[] = [];
+  const skipped: { jobId: number; reason: BulkSkipReason }[] = [];
+  const latestStatus = db.$client.prepare(
+    "select status from applications where job_id = ? and status != 'cancelled' order by created_at desc, id desc limit 1",
+  );
+  db.$client.transaction(() => {
+    for (const jobId of unique.slice(0, BULK_APPLY_MAX)) {
+      const app = latestStatus.get(jobId) as { status: ApplicationStatus } | undefined;
+      if (app && ACTIVE.has(app.status)) {
+        skipped.push({ jobId, reason: "active" });
+        continue;
+      }
+      const res = queueApplication(db, jobId, now);
+      if (res.ok) queued.push(jobId);
+      else skipped.push({ jobId, reason: res.error });
+    }
+  })();
+  for (const jobId of unique.slice(BULK_APPLY_MAX)) skipped.push({ jobId, reason: "limit" });
+  return { queued, skipped };
 }
 
 /** A candidatura aponta sempre para a tarefa em curso (prepare_apply e depois apply): o sync acompanha falhas das duas. */

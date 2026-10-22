@@ -1,7 +1,7 @@
 "use server";
 
 import { buildCompanyMessage } from "@/server/applications/message";
-import { createApplication, getApplication, retryApplication } from "@/server/applications/repo";
+import { applyJobs, queueApplication } from "@/server/applications/repo";
 import { getDb } from "@/server/db/client";
 import { restoreDiscarded, setJobStatus } from "@/server/jobs/list";
 import { getProfile } from "@/server/profile/repo";
@@ -36,16 +36,12 @@ export async function clearDiscardedCache(): Promise<number> {
 
 /** "Quero participar": cria a candidatura ou repete a última que falhou/pediu login. */
 export async function applyToJob(jobId: number): Promise<{ ok: true; id: number } | { ok: false; error: "linkedin" | "not_found" }> {
-  const db = getDb();
-  const last = db.$client
-    .prepare("select id from applications where job_id = ? and status in ('failed', 'login_required') order by id desc limit 1")
-    .get(jobId) as { id: number } | undefined;
-  if (last && getApplication(db, last.id)) {
-    retryApplication(db, last.id, Date.now());
-    return { ok: true, id: last.id };
-  }
-  const res = createApplication(db, jobId, Date.now());
-  return "id" in res ? { ok: true, id: res.id } : { ok: false, error: res.error };
+  return queueApplication(getDb(), jobId, Date.now());
+}
+
+/** "Quero participar" em lote: enfileira as elegíveis e conta as puladas. */
+export async function applyToJobs(jobIds: number[]): Promise<ReturnType<typeof applyJobs>> {
+  return applyJobs(getDb(), jobIds, Date.now());
 }
 
 export async function generateDrafts(jobId: number): Promise<{ taskId: number }> {
