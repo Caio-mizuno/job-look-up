@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { requireBrowser } from "./browser";
+import { HttpError } from "./http";
 import { SOURCE_LABELS } from "./labels";
 import { htmlToText } from "./text";
 import type { JobSource, RawJob } from "./types";
@@ -14,6 +15,8 @@ const TEXT_SELECTOR = ".update-components-text";
 const AUTHOR_SELECTOR = '.update-components-actor__title span[aria-hidden="true"]';
 
 const SCROLLS = 3;
+// Estado "nenhum resultado" do LinkedIn: zero posts de verdade, diferente de uma página que mudou de layout.
+const EMPTY_STATE = ".search-reusable-search-no-results, .artdeco-empty-state";
 const TITLE_MAX = 100;
 const ROLE = /desenvolvedor|desenvolvedora|developer|engenheir|engineer|programador|\bdev\b|tech lead|full ?stack|front-?end|back-?end/i;
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
@@ -83,6 +86,11 @@ export const linkedinPostsSource: JobSource = {
   fixedQueries: [{ keywords: '"desenvolvedor" and "contratando"', location: null }],
   async search(_q, _page, _http, ctx) {
     const html = await requireBrowser(ctx).getHtml(LINKEDIN_POSTS_URL, { waitFor: POST_SELECTOR, scrolls: SCROLLS });
+    // Sem posts e sem o estado vazio: os seletores quebraram. Vira erro na fonte, não "ok, 0 vagas" para sempre.
+    const $ = cheerio.load(html);
+    if ($(POST_SELECTOR).length === 0 && $(EMPTY_STATE).length === 0) {
+      throw new HttpError("não achei posts na página: o LinkedIn pode ter mudado o layout");
+    }
     return parseLinkedinPosts(html);
   },
 };

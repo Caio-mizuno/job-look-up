@@ -12,7 +12,7 @@ export const APPLY_COPY = {
     linkedinTip: "LinkedIn: só kit, para proteger sua conta",
   },
   bridgeOff: "Ajudante desligado: rode make bridge. Abrindo o Kit para você se candidatar à mão.",
-  queuedToast: "Candidatura na fila: o Chrome vai abrir a vaga e preencher. Nada é enviado sem você.",
+  queuedToast: "Candidatura na fila: o Chrome vai abrir a vaga, preencher e enviar se estiver tudo completo.",
   status: {
     queued: "Na fila",
     running: "Preenchendo no Chrome",
@@ -23,7 +23,13 @@ export const APPLY_COPY = {
     cancelled: "Cancelada",
   },
   lists: { filled: "Preenchido", drafted: "Rascunho da IA (revise)", unanswered: "Sem resposta" },
-  actions: { submitted: "Marquei como enviada", retry: "Tentar de novo", cancel: "Cancelar", open: "Abrir vaga" },
+  actions: {
+    submitted: "Marquei como enviada",
+    retry: "Tentar de novo",
+    cancel: "Cancelar",
+    cancelRunningHint: "Cancelar não interrompe uma candidatura que já está sendo preenchida no Chrome: ela pode ser enviada mesmo assim.",
+    open: "Abrir vaga",
+  },
   unanswered: {
     title: "Responda o que faltou",
     save: "Salvar como resposta pronta",

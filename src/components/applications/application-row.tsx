@@ -99,7 +99,12 @@ export function ApplicationRow({
           </Button>
         )}
         {a.status !== "submitted" && (
-          <Button size="sm" variant="ghost" onClick={() => onCancel(a.id)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onCancel(a.id)}
+            title={a.status === "running" ? C.actions.cancelRunningHint : undefined}
+          >
             {C.actions.cancel}
           </Button>
         )}

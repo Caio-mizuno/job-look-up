@@ -14,12 +14,11 @@ const job = (
 describe("canBulkApply", () => {
   it("accepts jobs without an active application", () => {
     expect(canBulkApply(job(null))).toBe(true);
-    expect(canBulkApply(job("failed"))).toBe(true);
     expect(canBulkApply(job("login_required"))).toBe(true);
   });
 
   it("rejects active, done, applied and linkedin jobs", () => {
-    for (const s of ["queued", "running", "needs_review", "submitted"] as const) expect(canBulkApply(job(s))).toBe(false);
+    for (const s of ["queued", "running", "needs_review", "submitted", "failed"] as const) expect(canBulkApply(job(s))).toBe(false);
     expect(canBulkApply(job(null, { status: "applied" }))).toBe(false);
     expect(canBulkApply(job(null, { url: "https://www.linkedin.com/feed/update/urn:li:activity:1/" }))).toBe(false);
   });

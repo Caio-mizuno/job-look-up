@@ -32,6 +32,10 @@ export const JOBS_COPY = {
     clear: "Limpar seleção",
     queued: (q: number, s: number) => (s > 0 ? `${q} na fila · ${s} puladas` : `${q} na fila`),
     bridgeOff: "Ajudante desligado: as candidaturas começam quando você rodar `make bridge`.",
+    confirmTitle: (n: number) => `Enviar ${n} candidaturas?`,
+    confirmBody: "O ajudante abre cada vaga no seu Chrome, preenche com os seus dados e envia quando estiver tudo completo. Envio não tem volta.",
+    confirm: (n: number) => `Enviar ${n}`,
+    cancel: "Cancelar",
   },
   discardedCache: {
     button: (n: number) => `Descartadas: ${n} · Limpar cache`,

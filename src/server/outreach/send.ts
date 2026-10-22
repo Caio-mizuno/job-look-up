@@ -76,6 +76,10 @@ export function getOutreachDraft(
   };
 }
 
+// Vagas com envio em andamento: a checagem de "já enviado" e o registro ficam dos dois lados de um await,
+// então duas requisições simultâneas (duas abas) passariam juntas sem esta trava.
+const inFlight = new Set<number>();
+
 /** Envia o e-mail revisado pela pessoa, com o CV anexado. Uma vez por vaga; falha fica no histórico e pode repetir. */
 export async function sendOutreachEmail(
   db: Db,
@@ -91,12 +95,13 @@ export async function sendOutreachEmail(
   if (!p?.cvPath || !existsSync(p.cvPath)) return { ok: false, error: "no_cv" };
   const to = draft.to.trim();
   if (!z.email().safeParse(to).success) return { ok: false, error: "invalid_to" };
-  if (sentAtOf(db, jobId) !== null) return { ok: false, error: "already_sent" };
+  if (inFlight.has(jobId) || sentAtOf(db, jobId) !== null) return { ok: false, error: "already_sent" };
 
   const record = db.$client.prepare(
     "insert into outreach_emails (job_id, to_email, subject, body, status, error, created_at) values (?, ?, ?, ?, ?, ?, ?)",
   );
   const name = p.personal.name.replace(/["\\]/g, "").trim();
+  inFlight.add(jobId);
   try {
     await (deps.transport ?? createMailTransport(cfg)).sendMail({
       from: name ? `"${name}" <${cfg.user}>` : cfg.user,
@@ -110,6 +115,8 @@ export async function sendOutreachEmail(
     const message = friendlySmtpError(err, cfg);
     record.run(jobId, to, draft.subject, draft.body, "failed", message, deps.now);
     return { ok: false, error: "smtp", message };
+  } finally {
+    inFlight.delete(jobId);
   }
   record.run(jobId, to, draft.subject, draft.body, "sent", null, deps.now);
   db.$client.prepare("update jobs set status = 'applied' where id = ?").run(jobId);

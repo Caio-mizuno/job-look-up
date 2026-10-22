@@ -38,6 +38,7 @@ describe("BulkApplyBar", () => {
     const p = bar({ selectedCount: 2 });
     expect(screen.getByRole("checkbox", { name: "Selecionar todas (4)" })).toHaveAttribute("aria-checked", "mixed");
     fireEvent.click(screen.getByRole("button", { name: "Quero participar (2)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Enviar 2" }));
     expect(p.onApply).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Limpar seleção" }));
     expect(p.onClear).toHaveBeenCalledTimes(1);

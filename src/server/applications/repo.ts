@@ -147,8 +147,10 @@ const REPORT_STATUS: Record<ApplyReport["status"], ApplicationStatus> = {
 
 export function applyReport(db: Db, id: number, report: ApplyReport, now: number): void {
   const status = REPORT_STATUS[report.status];
+  // Cancelar não para o Chrome que já está preenchendo: se ele enviou, a candidatura existe e vale mesmo cancelada.
+  const guard = status === "submitted" ? "" : " and status != 'cancelled'";
   db.$client
-    .prepare("update applications set status = ?, report = ?, error = ?, finished_at = ? where id = ? and status != 'cancelled'")
+    .prepare(`update applications set status = ?, report = ?, error = ?, finished_at = ? where id = ?${guard}`)
     .run(status, JSON.stringify(report), status === "failed" ? report.notes || report.status : null, now, id);
   // Enviada pelo ajudante: a vaga sai de "interessado" como no "Marquei como enviada".
   if (status === "submitted") {

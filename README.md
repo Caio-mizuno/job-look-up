@@ -57,7 +57,7 @@ Abra **http://127.0.0.1:3000** e siga o onboarding.
 | `make logs` | logs do app e do worker |
 | `make linkedin-login` | abre o Chrome do ajudante no login do LinkedIn, uma vez (para a fonte "LinkedIn (posts)"); pare o `make bridge` antes |
 
-Seus dados ficam em `./data` (banco SQLite e CV). Para backup, copie essa pasta.
+Seus dados ficam em `./data` (banco SQLite, CV e o perfil do Chrome do ajudante, que guarda a sessão do LinkedIn se você usar a fonte de posts). Para backup, copie essa pasta; ela é pessoal, não compartilhe.
 
 ## Privacidade
 
@@ -109,7 +109,7 @@ Em **Configuração → E-mail** dá para mandar um e-mail de teste para você m
 | Indeed, Glassdoor (pelo ajudante, num Chrome separado do seu) | Brasil | desligadas; podem ser bloqueadas |
 | LinkedIn (posts), posts de contratação das últimas 24 h (pelo ajudante, **com o seu login**) | global | desligada; ver abaixo |
 
-**Indeed e Glassdoor** recusam qualquer cliente que não seja navegador (desafio do Cloudflare). O ajudante abre a busca no Google Chrome instalado, com um perfil só do app (sem o seu login), minimizado (a janela só pisca ao abrir) e uma página por vez. Se o site pedir verificação, a fonte para e aparece como "limitada": o app não resolve captcha nem disfarça o navegador. Do Glassdoor vem só o resumo de cada vaga, porque a página de detalhes sempre pede verificação. Raspar esses sites vai contra os termos de uso deles, por isso as duas vêm desligadas.
+**Indeed e Glassdoor** recusam qualquer cliente que não seja navegador (desafio do Cloudflare). O ajudante abre a busca no Google Chrome instalado, com um perfil só do app (sem o login do seu Chrome; só guarda a sessão do LinkedIn se você rodar `make linkedin-login`), minimizado (a janela só pisca ao abrir) e uma página por vez. Se o site pedir verificação, a fonte para e aparece como "limitada": o app não resolve captcha nem disfarça o navegador. Do Glassdoor vem só o resumo de cada vaga, porque a página de detalhes sempre pede verificação. Raspar esses sites vai contra os termos de uso deles, por isso as duas vêm desligadas.
 
 **LinkedIn (posts)** abre a busca de publicações "desenvolvedor" e "contratando" das últimas 24 h no Chrome do ajudante e transforma cada post num card, com o e-mail de contato quando o post tiver um (botão **Enviar e-mail**). Essa busca exige login, então ela usa **a sua conta do LinkedIn**: rode `make linkedin-login` uma vez (com o ajudante parado), entre na janela que abrir e feche o Chrome. O ajudante só lê: uma página por busca, no máximo 3 rolagens, sem clicar, curtir, comentar ou mandar mensagem.
 
@@ -163,7 +163,7 @@ A stack inclui Next.js 16, React 19, Tailwind v4, shadcn/ui, SQLite (better-sqli
 3. Claude (through your own Claude Code subscription, via a small host helper) scores each job against your profile and summarizes it.
 4. On "apply", Claude in Chrome fills and **submits** the application in **your** Chrome; if a required answer is missing it stops before submitting and asks you.
 
-Everything runs on your machine with Docker (`make up`, then http://127.0.0.1:3000). Data stays in `./data`. LinkedIn is never automated; the app gives you a copy-paste kit for those jobs instead. MIT licensed.
+Everything runs on your machine with Docker (`make up`, then http://127.0.0.1:3000). Data stays in `./data`. LinkedIn job applications are never automated (you get a copy-paste kit instead). An optional, off-by-default source reads LinkedIn hiring posts from the last 24 h using **your** LinkedIn session in the helper's Chrome (`make linkedin-login`; against LinkedIn's terms, use at your own risk) and lets you e-mail the poster your CV through your Gmail (SMTP app password), only after you review and click Send. MIT licensed.
 
 ## Licença
 
