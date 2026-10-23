@@ -48,6 +48,17 @@ describe("createHttp", () => {
     expect(s.calls()).toBe(1);
   });
 
+  it("cacheTtlMs shares one download between concurrent calls", async () => {
+    const s = scripted([async () => new Response("big")]);
+    const http = createHttp({ fetchImpl: s.fetchImpl });
+    const both = await Promise.all([
+      http.getText("https://x/s", { cacheTtlMs: 60_000 }),
+      http.getText("https://x/s", { cacheTtlMs: 60_000 }),
+    ]);
+    expect(both).toEqual(["big", "big"]);
+    expect(s.calls()).toBe(1);
+  });
+
   it("sends the user agent", async () => {
     let ua = "";
     const fetchImpl = (async (_u: string, init: RequestInit) => {

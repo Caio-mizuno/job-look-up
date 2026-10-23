@@ -64,23 +64,37 @@ export function createHttp({
   const retryable = (err: unknown) =>
     err instanceof HttpError && !(err instanceof RateLimitedError) && (err.status === null || err.status >= 500);
 
-  const getText = async (url: string, opts: RequestOpts = {}): Promise<string> => {
-    if (opts.cacheTtlMs) {
-      const hit = cache.get(url);
-      if (hit && Date.now() - hit.at < opts.cacheTtlMs) return hit.body;
-    }
+  const withRetry = async (url: string, opts: RequestOpts): Promise<string> => {
     let attempt = 0;
     for (;;) {
       try {
-        const body = await once(url, opts);
-        if (opts.cacheTtlMs) cache.set(url, { at: Date.now(), body });
-        return body;
+        return await once(url, opts);
       } catch (err) {
         if (attempt >= retries || !retryable(err)) throw err;
         attempt++;
         await new Promise((r) => setTimeout(r, retryDelayMs));
       }
     }
+  };
+
+  // Consultas em paralelo pedindo o mesmo arquivo grande (feed, sitemap) esperam o mesmo download.
+  const inflight = new Map<string, Promise<string>>();
+
+  const getText = async (url: string, opts: RequestOpts = {}): Promise<string> => {
+    if (!opts.cacheTtlMs) return withRetry(url, opts);
+    const hit = cache.get(url);
+    if (hit && Date.now() - hit.at < opts.cacheTtlMs) return hit.body;
+    let pending = inflight.get(url);
+    if (!pending) {
+      pending = withRetry(url, opts)
+        .then((body) => {
+          cache.set(url, { at: Date.now(), body });
+          return body;
+        })
+        .finally(() => inflight.delete(url));
+      inflight.set(url, pending);
+    }
+    return pending;
   };
 
   return {
