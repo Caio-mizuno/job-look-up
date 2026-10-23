@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Briefcase, Cable, Mail, Radar, Send, UserRound } from "lucide-react";
+import { Bot, Briefcase, Cable, KeyRound, Mail, Radar, Send, UserRound } from "lucide-react";
 import { SHELL_COPY } from "@/components/shell/copy";
 import {
   Sidebar,
@@ -29,6 +29,7 @@ const CONFIG = [
   { href: "/config/fontes", title: SHELL_COPY.nav.sources, icon: Radar },
   { href: "/config/ia", title: SHELL_COPY.nav.ai, icon: Bot },
   { href: "/config/email", title: SHELL_COPY.nav.email, icon: Mail },
+  { href: "/config/credenciais", title: SHELL_COPY.nav.credentials, icon: KeyRound },
   { href: "/config/ajudante", title: SHELL_COPY.nav.bridge, icon: Cable },
 ] as const;
 

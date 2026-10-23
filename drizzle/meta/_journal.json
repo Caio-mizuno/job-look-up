@@ -22,6 +22,13 @@
       "when": 1792683786135,
       "tag": "0002_nasty_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792743454484,
+      "tag": "0003_credentials",
+      "breakpoints": true
     }
   ]
 }

@@ -120,6 +120,21 @@ export const outreachEmails = sqliteTable(
   (t) => [index("outreach_emails_job_idx").on(t.jobId)],
 );
 
+/** Cofre de logins dos sites de vaga: só a pessoa vê a senha; IA e ajudante nunca recebem. */
+export const credentials = sqliteTable("credentials", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  site: text().notNull(),
+  url: text(),
+  /** Domínio sem "www.": acha o login certo para o link de uma vaga. */
+  host: text(),
+  username: text().notNull(),
+  /** Cifrada com a APP_KEY (AES-256-GCM, ver server/crypto.ts). */
+  password: text().notNull(),
+  notes: text(),
+  createdAt: integer().notNull(),
+  updatedAt: integer().notNull(),
+});
+
 export type TaskStatus = "queued" | "running" | "done" | "failed";
 export type TaskRunner = "worker" | "bridge";
 

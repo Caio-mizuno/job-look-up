@@ -5,4 +5,8 @@ describe("PAGE_TITLES", () => {
   it("names the e-mail settings page", () => {
     expect(PAGE_TITLES["/config/email"]).toBe("E-mail");
   });
+
+  it("names the credentials page", () => {
+    expect(PAGE_TITLES["/config/credenciais"]).toBe("Credenciais");
+  });
 });

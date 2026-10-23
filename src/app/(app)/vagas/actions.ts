@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { buildCompanyMessage } from "@/server/applications/message";
 import { applyJobs, queueApplication } from "@/server/applications/repo";
+import { findCredentialForUrl } from "@/server/credentials/repo";
 import { getDb } from "@/server/db/client";
 import { restoreDiscarded, setJobStatus } from "@/server/jobs/list";
 import { getMailConfig } from "@/server/outreach/config";
@@ -59,6 +60,8 @@ export type KitData = {
   drafts: { pitch: string; whyCompany: string; message?: string } | null;
   /** Mensagem genérica (sem IA), usada quando ainda não há uma gerada. */
   message: string;
+  /** Login salvo em Credenciais para o site da vaga; a senha só vem pelo "Mostrar". */
+  credential: { id: number; site: string; username: string } | null;
 };
 
 export async function getKitData(jobId: number): Promise<KitData | null> {
@@ -87,6 +90,7 @@ export async function getKitData(jobId: number): Promise<KitData | null> {
         { label: "Habilidades", value: p.skills.map((s) => s.name).join(", ") },
       ]
     : [];
+  const cred = findCredentialForUrl(db, job.url);
   return {
     jobTitle: job.title,
     jobUrl: job.url,
@@ -101,6 +105,7 @@ export async function getKitData(jobId: number): Promise<KitData | null> {
       company: job.company,
       linkedin: p?.personal.linkedin ?? "",
     }),
+    credential: cred ? { id: cred.id, site: cred.site, username: cred.username } : null,
   };
 }
 

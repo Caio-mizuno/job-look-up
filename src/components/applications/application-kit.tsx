@@ -1,9 +1,12 @@
 "use client";
 
-import { Check, Copy, ExternalLink, Sparkles } from "lucide-react";
+import { Check, Copy, ExternalLink, KeyRound, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { revealPasswordAction } from "@/app/(app)/config/credenciais/actions";
 import { generateDrafts, getKitData, type KitData } from "@/app/(app)/vagas/actions";
+import { PasswordField } from "@/components/credentials/password-field";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { safeHttpUrl } from "@/lib/safe-url";
@@ -45,6 +48,32 @@ export function CompanyMessage({ message, hint }: { message: string; hint?: stri
     <section className="bg-muted/50 rounded-lg px-3 py-1">
       <CopyField label={C.message} value={message} />
       {hint && <p className="text-muted-foreground pb-2 text-xs">{hint}</p>}
+    </section>
+  );
+}
+
+/** Login do site da vaga salvo em Credenciais; sem ele, um atalho para salvar. */
+export function SiteLogin({ credential }: { credential: KitData["credential"] }) {
+  if (!credential)
+    return (
+      <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
+        <KeyRound className="size-3.5" />
+        {C.noLogin}
+        <Link href="/config/credenciais" className="hover:text-foreground underline underline-offset-2">
+          {C.saveLogin}
+        </Link>
+      </p>
+    );
+  return (
+    <section>
+      <h3 className="mb-1 text-sm font-medium">{C.login(credential.site)}</h3>
+      <div className="divide-y">
+        <CopyField label={C.loginField} value={credential.username} />
+        <div className="py-1.5">
+          <p className="text-muted-foreground text-[11px] uppercase tracking-wide">{C.password}</p>
+          <PasswordField id={credential.id} reveal={revealPasswordAction} />
+        </div>
+      </div>
     </section>
   );
 }
@@ -102,6 +131,7 @@ export function ApplicationKit({ jobId, open, onOpenChange }: { jobId: number | 
                 </a>
               </Button>
             )}
+            <SiteLogin credential={data.credential} />
             <CompanyMessage
               message={drafts?.message?.trim() ? drafts.message : data.message}
               hint={drafts?.message?.trim() ? undefined : C.messageHint}

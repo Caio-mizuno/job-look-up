@@ -9,6 +9,7 @@ export const SHELL_COPY = {
     sources: "Fontes de vaga",
     ai: "IA",
     email: "E-mail",
+    credentials: "Credenciais",
     bridge: "Ajudante",
   },
   bridge: {
@@ -25,5 +26,6 @@ export const PAGE_TITLES: Record<string, string> = {
   "/config/fontes": SHELL_COPY.nav.sources,
   "/config/ia": SHELL_COPY.nav.ai,
   "/config/email": SHELL_COPY.nav.email,
+  "/config/credenciais": SHELL_COPY.nav.credentials,
   "/config/ajudante": SHELL_COPY.nav.bridge,
 };

@@ -98,6 +98,10 @@ O envio sai da sua conta do Gmail, por SMTP com **senha de app**:
 
 Em **Configuração → E-mail** dá para mandar um e-mail de teste para você mesmo. A senha fica só no `.env`: nunca vai para o banco, para a tela ou para os logs.
 
+## Credenciais
+
+Em **Configuração → Credenciais** você guarda login e senha de cada site de vaga. A senha fica cifrada no banco com a `APP_KEY` do `.env` (AES-256-GCM) e só aparece quando você clica em **Mostrar** ou **Copiar**; a lista nunca manda a senha para o navegador. O kit de candidatura mostra o login salvo para o site da vaga (pelo domínio do endereço do login). É um cofre só seu: a IA, o ajudante e a candidatura automática nunca recebem a senha. Se a `APP_KEY` mudar, as senhas salvas não abrem mais e precisam ser salvas de novo.
+
 ## Fontes de vaga
 
 | Fonte | Tipo | Padrão |

@@ -1,0 +1,37 @@
+export const CREDENTIALS_COPY = {
+  title: "Credenciais",
+  description:
+    "Login e senha de cada site de vaga, só neste computador. A senha fica cifrada e só aparece quando você clica em Mostrar ou Copiar; a IA e o ajudante nunca a recebem.",
+  add: "Adicionar",
+  empty: "Nenhuma credencial salva.",
+  emptyHint: "Salve o login dos sites onde você se candidata. O kit de candidatura mostra o login do site da vaga.",
+  fields: {
+    site: "Site",
+    sitePlaceholder: "Gupy, Catho, InfoJobs…",
+    url: "Endereço do login",
+    urlPlaceholder: "https://…",
+    urlHint: "Opcional. Com ele, o kit de candidatura acha este login para as vagas do mesmo site.",
+    username: "Login",
+    usernamePlaceholder: "e-mail ou usuário",
+    password: "Senha",
+    passwordKeep: "Deixe em branco para manter a atual",
+    notes: "Observações",
+    notesPlaceholder: "Opcional",
+  },
+  dialog: { create: "Nova credencial", edit: "Editar credencial", save: "Salvar", saving: "Salvando…", cancel: "Cancelar" },
+  row: {
+    login: "Login",
+    password: "Senha",
+    edit: "Editar",
+    remove: "Excluir",
+    confirmRemove: "Confirmar exclusão",
+  },
+  password: {
+    show: "Mostrar senha",
+    hide: "Ocultar senha",
+    copy: "Copiar senha",
+    copied: "Senha copiada",
+    masked: "••••••••",
+  },
+  toast: { saved: "Credencial salva", removed: "Credencial excluída" },
+} as const;
