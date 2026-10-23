@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://www.netvagas.com.br/sitemap-netvagas-paginas.xml</loc>
+    <lastmod>2026-10-23T04:36:42-03:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.netvagas.com.br/sitemap-netvagas-vagas-1.xml</loc>
+    <lastmod>2026-10-23T04:19:48-03:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.netvagas.com.br/sitemap-netvagas-vagas-2.xml</loc>
+    <lastmod>2026-10-23T04:19:48-03:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.netvagas.com.br/sitemap-netvagas-vagas-3.xml</loc>
+    <lastmod>2026-10-23T04:19:48-03:00</lastmod>
+  </sitemap>
+</sitemapindex>

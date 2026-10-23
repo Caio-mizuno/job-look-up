@@ -1,0 +1,111 @@
+{
+ "opportunity": {
+  "id": 774832,
+  "name": "Especialista Salesforce",
+  "type_name": "Emprego",
+  "type_slug": "emprego",
+  "apply_url": "",
+  "category_name": "Tecnologia da Informação",
+  "category_slug": "ti",
+  "home_office": true,
+  "hybrid": false,
+  "published_at": "2026-10-21T10:50:05.000-03:00",
+  "highlight": true,
+  "badges": [],
+  "already_applied": false,
+  "salary": "NÃO DIVULGADA",
+  "hide_ads": false,
+  "regime": "PREST. DE SERVIÇO",
+  "quantity": 1,
+  "description": "Contratação para Just Solutions, nossa empresa especializado e tecnologia para desenvolver soluções conectadas aos desafios reais das empresas. \r\nAtuamos por meio de quatro pilares complementares: CRM, Data, AI e Tech. \r\n\r\nBuscamos uma pessoa com experiência sólida em Salesforce para assumir a liderança técnica do time de Delivery da BU CRM.\r\n\r\nEssa pessoa será responsável por orientar tecnicamente as entregas, apoiar o desenvolvimento dos profissionais, garantir qualidade e previsibilidade e atuar como ponto de conexão entre tecnologia, operação, squads e clientes.\r\n\r\nÉ uma posição para um perfil sênior ou especialista que tenha profundidade técnica, goste de resolver problemas e consiga transformar necessidades de negócio em soluções viáveis e sustentáveis.\r\n\r\nBuscamos uma pessoa que consiga conversar com o time técnico sobre uma implementação, com os squads sobre impactos e dependências, com o cliente sobre riscos e alternativas e com a liderança sobre capacidade, prioridades e qualidade.\r\n\r\nMais do que concentrar conhecimento, essa pessoa deverá elevar a maturidade técnica do time, apoiar o desenvolvimento dos profissionais e garantir que as soluções Salesforce sejam entregues com consistência, segurança e aderência às necessidades do negócio.\r\n\r\nResponsabilidades:\r\n- Liderar tecnicamente as entregas Salesforce, acompanhando definições, desenvolvimento, configuração, integrações, testes, implantação e sustentação;\r\n- Traduzir necessidades de negócio em direcionamentos técnicos claros e executáveis e vice versa;\r\n- Avaliar soluções, riscos, dependências e impactos antes da implementação;\r\n- Apoiar o time na resolução de problemas técnicos e nos temas de maior complexidade;\r\n- Realizar ou orientar revisões técnicas e QAs, garantindo padrões de qualidade, segurança e documentação;\r\n- Organizar boas práticas, padrões técnicos e critérios de aceite;\r\n- Acompanhar backlog, estimativas, prazos, capacidade e riscos técnicos em parceria com Projetos e demais lideranças;\r\n- Atuar de forma próxima aos squads de CS, Planejamento, BI, Projetos, Criativos, Front e demais disciplinas;\r\n- Participar de reuniões com clientes, explicando decisões, riscos e alternativas de maneira clara, com visão orientada ao negócio;\r\n- Orientar profissionais de diferentes níveis de senioridade por meio de direcionamento técnico, feedbacks, acompanhamento e compartilhamento de conhecimento;\r\n- Identificar necessidades de desenvolvimento e apoiar a evolução técnica e a autonomia do time;\r\n- Apoiar discoveries, estimativas e desenhos de solução quando necessário.\r\n\r\nEsperamos uma pessoa que:\r\n- Desenvolva o time sem centralizar todo o conhecimento;\r\n- Saiba orientar, acompanhar, dar feedback e cobrar qualidade;\r\n- Promova autonomia com responsabilidade;\r\n- Consiga conduzir conversas difíceis de forma respeitosa e objetiva;\r\n- Tenha facilidade para trabalhar com diferentes disciplinas;\r\n- Escute o contexto de negócio antes de propor uma solução;\r\n- Comunique riscos e impedimentos com antecedência;\r\n- Atue com organização, senso de responsabilidade e foco na solução;\r\n- Consiga se posicionar tecnicamente sem perder a visão da entrega final para o cliente.",
+  "perks": "Vale-refeição (cartão Flash; crédito/débito; podendo utilizar em redes com CNPJ de food (exemplo: restaurante, mercado e aplicativos).\r\nNotebook da empresa para quem está em SP;\r\n13ª nota no ano;\r\nFérias de 30 dias + 1/3 (benefício adquirido após 1 ano de contrato);\r\nAssistência Médica SulAmérica (coparticipação apenas se utilizar);\r\nSeguro de vida;\r\nDay-off + voucher no dia do aniversário no cartão flash;\r\nAssistência Odontológica SulAmérica - Plano opcional (caso opte pelo benefício, é descontado todo mês, mesmo que não utilize)\r\nIncentivo a prática de exercício físico - TotalPass\r\nIncentivo a educação - Reembolso mensal para cursos e treinamentos (válido a partir de: após 6 meses de contrato, participação na avaliação de performance, alinhamento prévio com gestor e com plano de desenvolvimento individual ativo)",
+  "prerequisite": "Experiência sênior em implementação, evolução ou sustentação de soluções Salesforce;\r\nConhecimento sólido do ecossistema Salesforce e de seus principais conceitos de arquitetura, dados, segurança, integrações e deployment;\r\nExperiência prática em análise e resolução de problemas técnicos;\r\nCapacidade de avaliar requisitos de negócio e transformá-los em soluções técnicas viáveis e vice-versa;\r\nConhecimento de APIs, integrações REST/SOAP, webhooks e troca de dados entre sistemas;\r\nConhecimento de desenvolvimento, versionamento, testes, documentação e práticas de qualidade;\r\nVivência com backlog, estimativas, releases, priorização e gestão de riscos técnicos;\r\nExperiência como referência técnica, apoiando ou orientando outros profissionais;\r\nComunicação clara para interagir com clientes, lideranças, squads e equipes técnicas;\r\nCapacidade de equilibrar profundidade técnica, qualidade, prazo e necessidade de negócio;\r\nBuscamos uma pessoa com profundidade técnica em Salesforce e capacidade de orientar o time em temas como: Modelo de dados e segurança; APIs e integrações; Automação e configuração de fluxos;\r\nDesenvolvimento, testes e deployment; SOQL/SOSL; Flow; Apex; LWC; AMPscript; SSJS; SQL aplicado ao contexto de CRM e Marketing Cloud.\r\nExperiência com Salesforce Marketing Cloud;\r\nExperiência com Sales Cloud, Service Cloud ou Data Cloud/Data 360.\r\nNão é necessário possuir o mesmo nível de domínio em todos os componentes. Será considerada a profundidade na principal frente de atuação, combinada à capacidade de analisar soluções, orientar especialistas e identificar quando outro conhecimento técnico precisa ser mobilizado.",
+  "desirable": "Certificações Salesforce;\r\nConhecimento de MuleSoft ou outras plataformas de integração;\r\nExperiência com CI/CD e práticas de DevOps aplicadas a Salesforce;\r\nVivência em consultorias, integradoras ou operações com múltiplos clientes;\r\nExperiência com CRM, automação de marketing, dados ou Customer Experience;\r\nParticipação em discovery, estimativas ou desenho de soluções;\r\nInglês técnico para leitura de documentação.\r\nSe você tem experiência como referência técnica, facilidade para compartilhar conhecimento e interesse em desenvolver pessoas, vamos conversar! ",
+  "other_info": "Modelo de contratação: PJ.\r\nTipo de CNPJ/Empresa: ME (microempresa) ou LTDA (Empresa de Responsabilidade Limitada).",
+  "comments": "",
+  "address": "Home office",
+  "applies_count": 17,
+  "facebook_shares": "0",
+  "facebook_share_url": "http://www.facebook.com/share.php?u=http://trampos.co/oportunidades/774832-especialista-salesforce",
+  "tweet_count": "0",
+  "twitter_share_url": "http://twitter.com/share?text=Oportunidade de Especialista Salesforce @ B&Partners (via @trampos)&url=http://trampos.co/oportunidades/774832-especialista-salesforce",
+  "email_shares": "28",
+  "email_share_url": "https://trampos.co/oportunidades/774832-especialista-salesforce/share/email",
+  "whatsapp_shares": "20",
+  "whatsapp_share_url": "https://trampos.co/oportunidades/774832-especialista-salesforce/share/whatsapp",
+  "custom_company_name": null,
+  "url": "http://trampos.co/oportunidades/774832-especialista-salesforce",
+  "apply_method": 3,
+  "bitly_url": null,
+  "opportunity_questions": [
+   {
+    "id": 94897,
+    "body": "Qual foi o seu último salário ou salário atual? Aceita trabalhar no contrato PJ? Temos o pacote completo de benefícios.",
+    "question_type": "text",
+    "required": true
+   },
+   {
+    "id": 94898,
+    "body": "Nos informe por gentileza o Link do seu Linkedin. (Não colocar somente o nome).",
+    "question_type": "text",
+    "required": true
+   },
+   {
+    "id": 94899,
+    "body": "Você possui experiência sênior com implementação, evolução ou sustentação de soluções Salesforce?",
+    "question_type": "boolean",
+    "required": true
+   },
+   {
+    "id": 94900,
+    "body": "Quais tecnologias/soluções Salesforce você possui experiência prática? Selecione todas as opções aplicáveis:",
+    "question_type": "text",
+    "required": true
+   },
+   {
+    "id": 94901,
+    "body": "Você já atuou como referência técnica, orientando desenvolvedores ou profissionais de Salesforce e apoiando decisões técnicas, revisão de soluções ou resolução de problemas complexos?",
+    "question_type": "boolean",
+    "required": true
+   },
+   {
+    "id": 94902,
+    "body": "Você possui experiência em traduzir requisitos de negócio em soluções técnicas Salesforce, avaliando riscos, integrações, dependências e impactos para a entrega?",
+    "question_type": "boolean",
+    "required": true
+   }
+  ],
+  "company": {
+   "id": 961258,
+   "name": "B&Partners",
+   "logo": "//cdn3.trampos.co/companies/logos/961258/2230cc59105ed3987133dde1fc5d29c02dea9c50/medium/logo_Biosphera.PNG",
+   "logo_mini": "//cdn3.trampos.co/companies/logos/961258/3ef4de6a934bc66d2c5b43fa33549b75e9996273/mini/logo_Biosphera.PNG",
+   "cover": "//cdn3.trampos.co/companies/covers/961258/4bf3da42da70b36f07953acb5ed54426801bba7d/original/Biosphera_Logo.png?1764937672",
+   "slug": "biosphera",
+   "url": "https://trampos.co/biosphera",
+   "description": "Somos a Biosphera.ntwk.\r\nUma network independente de empresas líderes em tecnologia, marketing, vendas e consultoria. Atuamos de forma integrada para acelerar o growth de marcas e negócios em um modelo AI-driven, onde inteligência artificial potencializa estratégias, decisões e performance. Nosso nome traduz o nosso propósito: ser um organismo em expansão contínua, que conecta especialistas, clientes e talentos em um só movimento de crescimento.\r\nNossas empresas são Biomas. Comunidades vivas com identidade, especialidades e talentos próprios, que se complementam na criação de soluções inteligentes e originais em um modelo AI-first.\r\nCada bioma preserva sua essência, sua cultura e forma única de pensar, ao mesmo tempo em que compartilha conhecimento e propósito dentro da network. Diferentes por natureza, mas conectados por um mesmo objetivo: impulsionar o crescimento de negócios.",
+   "employees": "501-1000 funcionários",
+   "is_eoe": false,
+   "networks": [
+    {
+     "id": 15155,
+     "icon": "fa fa-facebook-square",
+     "name": "Facebook",
+     "url": "http://www.facebook.com/BPartners.co"
+    },
+    {
+     "id": 15156,
+     "icon": "fa fa-instagram",
+     "name": "Instagram",
+     "url": "http://instagram.com/biosphera.ntwk"
+    },
+    {
+     "id": 16803,
+     "icon": "fa fa-linkedin-square",
+     "name": "Linkedin",
+     "url": "http://linkedin.com/company/biosphera-ntwk/"
+    }
+   ]
+  }
+ }
+}

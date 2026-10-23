@@ -102,9 +102,11 @@ Em **Configuração → E-mail** dá para mandar um e-mail de teste para você m
 
 | Fonte | Tipo | Padrão |
 |---|---|---|
-| Gupy, Programathor, Vagas.com.br, InfoJobs | Brasil | ligadas |
+| Gupy, Programathor, Vagas.com.br, InfoJobs, Netvagas, Catho, BNE, Empregos.com.br, Sólides Vagas, GeekHunter, Trampos | Brasil | ligadas |
+| Remotar | remoto, Brasil | ligada |
 | Remotive, Remote OK, Himalayas, We Work Remotely, Working Nomads, Jobicy | remoto internacional | ligadas |
 | Arbeitnow | Europa | desligada |
+| Coodesh | Brasil | desligada; ver abaixo |
 | LinkedIn (endpoint público, **nunca usa seu login**) | global | desligada; pode ser bloqueada |
 | Indeed, Glassdoor (pelo ajudante, num Chrome separado do seu) | Brasil | desligadas; podem ser bloqueadas |
 | LinkedIn (posts), posts de contratação das últimas 24 h (pelo ajudante, **com o seu login**) | global | desligada; ver abaixo |
@@ -115,8 +117,11 @@ Em **Configuração → E-mail** dá para mandar um e-mail de teste para você m
 
 > **Atenção:** automação numa conta logada vai contra os termos de uso do LinkedIn e existe risco de restrição da conta. Use por sua conta e risco; a fonte vem desligada.
 
-**Ficaram de fora:**
-- **NetVagas, Remotar, Catho, Trampos e Coodesh** só montam a lista de vagas via JavaScript.
+**Netvagas** cifra as páginas e recusa navegador automatizado, então o app não abre o site: lê o sitemap público de vagas (liberado no robots.txt), só os dois arquivos mais novos, com cache de 6 h. Vem título (tirado do endereço, sem acento), link e data; sem empresa nem descrição. As vagas de até 30 dias que casam mais palavras da consulta aparecem primeiro, até 40 por consulta.
+
+**Coodesh** proíbe robôs na API de busca (robots.txt), então a fonte lê o sitemap público de vagas e filtra pelo endereço; a descrição vem da página da vaga. O endereço às vezes não bate mais com o título atual e boa parte das vagas é de uma empresa só, por isso ela vem desligada.
+
+**Remotar, Sólides e Trampos** usam a mesma API pública e sem login que a página de busca deles chama. **Catho** usa a busca no caminho (`/vagas/<palavras>/`), porque `?q=` é proibido no robots.txt. A busca do **GeekHunter** depende da ordem das palavras: "react" acha vagas, "desenvolvedor react" pode voltar vazio.
 
 Regras de boa convivência:
 - poucas requisições por busca, com cache de 6 h nas APIs que pedem isso;

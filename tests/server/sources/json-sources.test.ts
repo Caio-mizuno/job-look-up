@@ -66,13 +66,21 @@ describe("arbeitnow", () => {
 });
 
 describe("registry", () => {
-  it("has 15 sources; LinkedIn, LinkedIn posts, Arbeitnow, Indeed and Glassdoor off by default", () => {
-    expect(SOURCES).toHaveLength(15);
+  it("has 24 sources; LinkedIn, LinkedIn posts, Arbeitnow, Coodesh, Indeed and Glassdoor off by default", () => {
+    expect(SOURCES).toHaveLength(24);
     expect(SOURCES.filter((s) => s.defaultEnabled).map((s) => s.id)).toEqual([
       "gupy",
       "programathor",
       "vagascom",
       "infojobs",
+      "netvagas",
+      "catho",
+      "bne",
+      "empregos",
+      "solides",
+      "geekhunter",
+      "trampos",
+      "remotar",
       "remotive",
       "remoteok",
       "himalayas",
