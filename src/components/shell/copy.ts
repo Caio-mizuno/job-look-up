@@ -4,6 +4,7 @@ export const SHELL_COPY = {
   groups: { main: "Busca", config: "Configuração" },
   nav: {
     profile: "Meu perfil",
+    coverLetter: "Carta de apresentação",
     jobs: "Vagas encontradas",
     applications: "Candidaturas",
     sources: "Fontes de vaga",
@@ -21,6 +22,7 @@ export const SHELL_COPY = {
 
 export const PAGE_TITLES: Record<string, string> = {
   "/perfil": SHELL_COPY.nav.profile,
+  "/carta": SHELL_COPY.nav.coverLetter,
   "/vagas": SHELL_COPY.nav.jobs,
   "/candidaturas": SHELL_COPY.nav.applications,
   "/config/fontes": SHELL_COPY.nav.sources,

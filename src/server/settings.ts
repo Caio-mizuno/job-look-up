@@ -8,6 +8,8 @@ export type LlmProviderId = "claude-code" | "anthropic" | "openai-compatible";
 export type OpenAiCompatibleConfig = { baseUrl: string; model: string; apiKey: string };
 /** Última importação de currículo que deu certo: a etapa mostra de onde o perfil veio. */
 export type LastImport = { source: string; at: number };
+/** Carta de apresentação genérica; fora do perfil para editar a carta não mudar a versão do perfil. */
+export type CoverLetter = { text: string; updatedAt: number };
 
 type Def<T> = { default: T; secret: boolean };
 const def = <T>(value: T, secret = false): Def<T> => ({ default: value, secret });
@@ -24,6 +26,7 @@ export const SETTINGS = {
   "bridge.privacyAcceptedAt": def<number | null>(null),
   "onboarding.completedSteps": def<number[]>([]),
   "onboarding.lastImport": def<LastImport | null>(null),
+  "profile.coverLetter": def<CoverLetter | null>(null),
 };
 
 export type SettingKey = keyof typeof SETTINGS;

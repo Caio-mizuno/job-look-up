@@ -52,14 +52,14 @@ describe("finishOnboarding", () => {
     expect(await finishOnboarding()).toEqual({ ok: false, missing: ["name", "email", "experienceOrSkill", "preferences"] });
   });
 
-  it("enqueues generate_queries when ready", async () => {
+  it("enqueues generate_queries and the cover letter when ready", async () => {
     const p = sampleProfile();
     await saveStep(2, { personal: p.personal, headline: p.headline, summary: p.summary });
     await saveStep(3, p.experiences);
     await saveStep(6, p.preferences);
     expect(await finishOnboarding()).toEqual({ ok: true });
-    const t = db.$client.prepare("select type from tasks").all();
-    expect(t).toEqual([{ type: "generate_queries" }]);
+    const t = db.$client.prepare("select type from tasks order by id").all();
+    expect(t).toEqual([{ type: "generate_queries" }, { type: "generate_cover_letter" }]);
   });
 });
 

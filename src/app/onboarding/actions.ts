@@ -95,5 +95,6 @@ export async function finishOnboarding(): Promise<{ ok: true } | { ok: false; mi
   if (!readiness.ready) return { ok: false, missing: readiness.missing };
   // generate_queries dispara a primeira busca quando termina.
   enqueue(db, { type: "generate_queries", payload: {} });
+  enqueue(db, { type: "generate_cover_letter", payload: {} });
   return { ok: true };
 }
