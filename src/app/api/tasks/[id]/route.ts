@@ -2,7 +2,7 @@ import { getDb } from "@/server/db/client";
 import { getTask, type TaskType } from "@/server/tasks/queue";
 
 // Só tarefas que a UI acompanha; payloads de candidatura (dados pessoais, CV) ficam de fora.
-const VISIBLE = new Set<TaskType>(["llm_test", "extract_profile", "draft_answers", "generate_cover_letter"]);
+const VISIBLE = new Set<TaskType>(["llm_test", "extract_profile", "draft_answers", "generate_cover_letter", "generate_study"]);
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }): Promise<Response> {
   const id = Number((await ctx.params).id);

@@ -27,6 +27,11 @@ describe("GET /api/tasks/:id", () => {
     expect((await call(id)).status).toBe(200);
   });
 
+  it("shows the study task so the page can wait for it", async () => {
+    const id = enqueue(db, { type: "generate_study", payload: {}, runAt: 0 });
+    expect((await call(id)).status).toBe(200);
+  });
+
   it("404 for apply and unknown ids", async () => {
     const apply = enqueue(db, { type: "apply", runner: "bridge", payload: { secret: 1 }, runAt: 0 });
     expect((await call(apply)).status).toBe(404);

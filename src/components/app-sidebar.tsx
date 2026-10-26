@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Briefcase, Cable, FileText, KeyRound, Mail, Radar, Send, UserRound } from "lucide-react";
+import { Bot, Briefcase, Cable, FileText, GraduationCap, KeyRound, Mail, Radar, Send, UserRound } from "lucide-react";
 import { SHELL_COPY } from "@/components/shell/copy";
 import {
   Sidebar,
@@ -22,6 +22,7 @@ import { useAppStatus } from "@/lib/use-app-status";
 const MAIN = [
   { href: "/perfil", title: SHELL_COPY.nav.profile, icon: UserRound, count: null },
   { href: "/carta", title: SHELL_COPY.nav.coverLetter, icon: FileText, count: null },
+  { href: "/estudo", title: SHELL_COPY.nav.study, icon: GraduationCap, count: null },
   { href: "/vagas", title: SHELL_COPY.nav.jobs, icon: Briefcase, count: "jobs" },
   { href: "/candidaturas", title: SHELL_COPY.nav.applications, icon: Send, count: "applications" },
 ] as const;

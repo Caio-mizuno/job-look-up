@@ -3,6 +3,7 @@ import { decrypt, encrypt } from "@/server/crypto";
 import type { Db } from "@/server/db/client";
 import { settings } from "@/server/db/schema";
 import { getEnv } from "@/server/env";
+import type { StudyPlan } from "@/server/study/generate";
 
 export type LlmProviderId = "claude-code" | "anthropic" | "openai-compatible";
 export type OpenAiCompatibleConfig = { baseUrl: string; model: string; apiKey: string };
@@ -27,6 +28,7 @@ export const SETTINGS = {
   "onboarding.completedSteps": def<number[]>([]),
   "onboarding.lastImport": def<LastImport | null>(null),
   "profile.coverLetter": def<CoverLetter | null>(null),
+  "study.plan": def<StudyPlan | null>(null),
 };
 
 export type SettingKey = keyof typeof SETTINGS;

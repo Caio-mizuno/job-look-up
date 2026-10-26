@@ -10,6 +10,7 @@ export type TaskType =
   | "draft_answers"
   | "prepare_apply"
   | "generate_cover_letter"
+  | "generate_study"
   | "llm_call"
   | "apply"
   | "browser_fetch";

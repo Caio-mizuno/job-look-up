@@ -10,6 +10,10 @@ describe("PAGE_TITLES", () => {
     expect(PAGE_TITLES["/carta"]).toBe("Carta de apresentação");
   });
 
+  it("names the study page", () => {
+    expect(PAGE_TITLES["/estudo"]).toBe("Estudo");
+  });
+
   it("names the credentials page", () => {
     expect(PAGE_TITLES["/config/credenciais"]).toBe("Credenciais");
   });

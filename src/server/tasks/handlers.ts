@@ -6,6 +6,7 @@ import { llmTestHandler } from "@/server/llm/test-handler";
 import { enrichHandler } from "@/server/pipeline/enrich";
 import { generateQueriesHandler } from "@/server/pipeline/queries";
 import { searchRunHandler } from "@/server/pipeline/search-run";
+import { generateStudyHandler } from "@/server/study/generate";
 import type { Task, TaskType } from "./queue";
 
 export type Handler = (task: Task, ctx: { db: Db; now: () => number }) => Promise<unknown>;
@@ -20,4 +21,5 @@ export const handlers: Partial<Record<TaskType, Handler>> = {
   prepare_apply: prepareApplyHandler,
   draft_answers: draftAnswersHandler,
   generate_cover_letter: generateCoverLetterHandler,
+  generate_study: generateStudyHandler,
 };

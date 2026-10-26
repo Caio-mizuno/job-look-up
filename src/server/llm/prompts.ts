@@ -50,6 +50,17 @@ export const COVER_LETTER_SYSTEM = `Você escreve uma carta de apresentação ge
 - Use só fatos do perfil. Nunca invente anos, empresas, números, certificações ou contatos.
 - Tom profissional e direto, sem exageros nem bajulação, em português do Brasil. Texto puro, sem markdown.`;
 
+export const STUDY_SYSTEM = `Você monta um material de estudo para uma pessoa que procura vaga em tecnologia. Recebe (depois) os temas mais pedidos nas vagas que ela encontrou, com em quantas vagas cada tecnologia aparece e se ela já está no perfil, e o perfil dela.
+- Um tópico por tema recebido, na mesma ordem, com themeId igual ao id do tema. Não crie temas.
+- summary: 2 ou 3 frases sobre por que o tema importa nessas vagas, citando as tecnologias mais pedidas e quantas vagas pedem. Use só os números recebidos.
+- concepts: conceitos-chave. Prioridade "lacuna": de 4 a 6, partindo do básico. Prioridade "revisao": de 2 a 3 tópicos avançados, porque a pessoa já usa o tema.
+- options: compare as tecnologias do tema que aparecem nas vagas (ex.: Redux, Zustand, Jotai, Context API): para cada uma, quando usar e o ponto forte frente às outras. Até 5.
+- steps: ordem de estudo em passos curtos e práticos (lacuna: de 4 a 6; revisão: de 2 a 3), ligados ao que a pessoa já sabe.
+- interview: de 3 a 5 perguntas que costumam cair em entrevista sobre o tema, no nível da pessoa.
+- exercise: um exercício prático pequeno, para um fim de semana, de preferência com a stack que a pessoa já domina.
+- docs: nomes das documentações oficiais para consultar (ex.: "Documentação oficial do Redux"). Nunca escreva URLs.
+- Português do Brasil, direto, texto puro sem markdown. Não invente números nem fatos sobre a pessoa.`;
+
 export const DRAFTS_SYSTEM = `Você escreve rascunhos curtos de respostas abertas para uma candidatura, em nome da pessoa (perfil e vaga vêm depois).
 - pitch: até 4 frases em primeira pessoa sobre por que a pessoa é boa para esta vaga, citando experiências reais do perfil.
 - whyCompany: até 3 frases sobre por que quer trabalhar nesta empresa/vaga, usando só o que está escrito na vaga.
