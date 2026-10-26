@@ -1,6 +1,7 @@
 import type { Db } from "@/server/db/client";
 import { isBridgeOnline } from "@/server/bridge/presence";
 import { isCapReached } from "@/server/llm/usage";
+import { enabledSourceIdsJson } from "@/server/sources/settings";
 
 export type SourceRunStatus = { status: "running" | "ok" | "limited" | "error"; count: number; error?: string };
 
@@ -16,7 +17,7 @@ export function getStatus(db: Db, now: number): AppStatus {
   const run = db.$client
     .prepare("select id, status, per_source from search_runs order by id desc limit 1")
     .get() as { id: number; status: "running" | "done" | "interrupted"; per_source: string } | undefined;
-  const count = (sql: string) => (db.$client.prepare(sql).get() as { c: number }).c;
+  const count = (sql: string, ...args: unknown[]) => (db.$client.prepare(sql).get(...args) as { c: number }).c;
 
   return {
     bridgeOnline: isBridgeOnline(db, now),
@@ -24,7 +25,10 @@ export function getStatus(db: Db, now: number): AppStatus {
     pendingAnalysis: count("select count(*) c from tasks where type = 'enrich' and status in ('queued','running')"),
     capReached: isCapReached(db, now),
     counts: {
-      jobs: count("select count(*) c from jobs where status != 'discarded'"),
+      jobs: count(
+        "select count(*) c from jobs where status != 'discarded' and source in (select value from json_each(?))",
+        enabledSourceIdsJson(db),
+      ),
       applications: count("select count(*) c from applications where status != 'cancelled'"),
     },
   };

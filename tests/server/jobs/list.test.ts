@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Db } from "@/server/db/client";
 import { listJobs } from "@/server/jobs/list";
+import { setSourceEnabled } from "@/server/sources/settings";
 import { memDb } from "../../helpers/db";
 
 const NOW = Date.UTC(2026, 9, 21, 12);
@@ -143,6 +144,17 @@ describe("listJobs", () => {
     const db = memDb();
     job(db, 1, { source: "remoteok" });
     expect(listJobs(db, { sort: "match" }, ctx).items[0]).toMatchObject({ sourceLabel: "Remote OK", sourceHomepage: "https://remoteok.com" });
+  });
+
+  it("hides jobs from disabled sources and shows them again when re-enabled", () => {
+    const db = memDb();
+    job(db, 1, { source: "gupy" });
+    job(db, 2, { source: "himalayas" });
+    job(db, 3, { source: "linkedin" }); // desligada por padrão, sem linha em sources
+    setSourceEnabled(db, "himalayas", false);
+    expect(listJobs(db, { sort: "recent" }, ctx).items.map((j) => j.source)).toEqual(["gupy"]);
+    setSourceEnabled(db, "himalayas", true);
+    expect(listJobs(db, { sort: "recent" }, ctx).items.map((j) => j.source)).toEqual(["gupy", "himalayas"]);
   });
 });
 

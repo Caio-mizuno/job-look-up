@@ -58,3 +58,8 @@ export function enabledSources(db: Db): JobSource[] {
   const on = new Set(getSourceStates(db).filter((s) => s.enabled).map((s) => s.id));
   return SOURCES.filter((s) => on.has(s.id));
 }
+
+/** Ids das fontes ligadas em JSON, para `source in (select value from json_each(?))`: lista vazia vira filtro vazio. */
+export function enabledSourceIdsJson(db: Db): string {
+  return JSON.stringify(enabledSources(db).map((s) => s.id));
+}

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { touchBridge } from "@/server/bridge/presence";
 import { recordUsage } from "@/server/llm/usage";
 import { setSetting } from "@/server/settings";
+import { setSourceEnabled } from "@/server/sources/settings";
 import { getStatus } from "@/server/status";
 import { claimNext, enqueue } from "@/server/tasks/queue";
 import { memDb } from "../helpers/db";
@@ -58,5 +59,16 @@ describe("getStatus", () => {
     const s = getStatus(db, NOW);
     expect(s.run).toEqual({ id: 2, status: "running", perSource: { gupy: { status: "ok", count: 3 } } });
     expect(s.counts).toEqual({ jobs: 1, applications: 0 });
+  });
+
+  it("job count leaves out disabled sources", () => {
+    const db = memDb();
+    db.$client
+      .prepare(
+        "insert into jobs (source, url, dedupe_key, title, status, first_seen_at, last_seen_at) values ('gupy','u1','k1','A','new',0,0), ('himalayas','u2','k2','B','new',0,0), ('linkedin','u3','k3','C','new',0,0)",
+      )
+      .run();
+    setSourceEnabled(db, "himalayas", false);
+    expect(getStatus(db, NOW).counts.jobs).toBe(1);
   });
 });

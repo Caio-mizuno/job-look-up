@@ -3,6 +3,7 @@ import type { ApplicationStatus, JobStatus } from "@/server/db/schema";
 import type { Contract, Seniority, WorkModel } from "@/server/domain/enums";
 import type { Enrichment } from "@/server/pipeline/enrich";
 import { getSource } from "@/server/sources/registry";
+import { enabledSourceIdsJson } from "@/server/sources/settings";
 
 const DAY = 86_400_000;
 
@@ -89,8 +90,9 @@ export function listJobs(
   // Chave de ordenação estável (k1, k2, id) também serve de cursor.
   const k1 = q.sort === "match" ? "coalesce(e.match_score, -1)" : "coalesce(j.posted_at, j.first_seen_at)";
   const k2 = q.sort === "match" ? "j.local_score" : "0";
-  const where: string[] = ["j.status != 'discarded'"];
-  const args: unknown[] = [ctx.profileVersion ?? ""];
+  // Fonte desligada some da lista; religar traz as vagas de volta.
+  const where: string[] = ["j.status != 'discarded'", "j.source in (select value from json_each(?))"];
+  const args: unknown[] = [ctx.profileVersion ?? "", enabledSourceIdsJson(db)];
 
   const inList = (col: string, values?: string[]) => {
     if (!values || values.length === 0) return;
