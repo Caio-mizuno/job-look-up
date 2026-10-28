@@ -6,7 +6,7 @@ import {
   LINKEDIN_POSTS_URL,
   linkedinPostsSource,
   parseLinkedinPosts,
-  POST_SELECTOR,
+  POST_READY,
   postTitle,
 } from "@/server/sources/linkedin-posts";
 import { fixtureBrowser, sourceFixture } from "../../helpers/http";
@@ -39,13 +39,14 @@ describe("linkedin posts", () => {
     });
     expect(a.postedAt?.toISOString()).toBe("2026-10-22T10:00:00.000Z");
     expect(a.descriptionText).toContain("Envie seu CV");
-    expect(a.descriptionText).not.toContain("ver mais");
+    expect(a.descriptionText).toContain("Vaga: Desenvolvedor PHP Pleno (remoto)\nEnvie seu CV para vagas@exemplo.com.br.");
+    expect(a.descriptionText).not.toMatch(/… mais/);
     expect(b).toMatchObject({
       title: "Procuramos dev React sênior, híbrido em SP. Me chama no direct!",
       company: "Pessoa Recrutadora B",
       contactEmail: null,
     });
-    expect(c).toMatchObject({ company: "Pessoa Recrutadora C", contactEmail: "rh@exemplo.com" });
+    expect(c).toMatchObject({ title: "Vaga aberta: Desenvolvedora Full Stack", company: "Pessoa Recrutadora C", contactEmail: "rh@exemplo.com" });
   });
 
   it("extractEmails", () => {
@@ -74,7 +75,14 @@ describe("linkedin posts", () => {
     const ctx = fixtureBrowser([[/linkedin\.com\/search\/results\/content/, html]]);
     const jobs = await linkedinPostsSource.search({ keywords: "ignorada", location: null }, 1, createHttp(), ctx);
     expect(jobs).toHaveLength(3);
-    expect(ctx.calls).toEqual([{ url: LINKEDIN_POSTS_URL, waitFor: POST_SELECTOR, scrolls: 3 }]);
+    // O data-urn só existe depois que o ajudante anota a página: espera pelo post renderizado.
+    expect(POST_READY).toBe('[data-view-name="feed-full-update"]');
+    expect(ctx.calls).toEqual([{ url: LINKEDIN_POSTS_URL, waitFor: POST_READY, scrolls: 3 }]);
     expect(linkedinPostsSource).toMatchObject({ id: "linkedin_posts", label: "LinkedIn (posts)", defaultEnabled: false, maxPages: 1 });
+  });
+
+  it("returns no posts on LinkedIn's real empty state", async () => {
+    const ctx = fixtureBrowser([[/linkedin\.com\/search\/results\/content/, sourceFixture("linkedin-posts-empty.html")]]);
+    await expect(linkedinPostsSource.search({ keywords: "x", location: null }, 1, createHttp(), ctx)).resolves.toEqual([]);
   });
 });

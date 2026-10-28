@@ -16,6 +16,29 @@ const LOGIN_WALL = /^\/(login|authwall|checkpoint|uas\/login|signup)/;
 const CHALLENGE = /just a moment|um momento|attention required|additional verification|blocked/i;
 
 /**
+ * Roda dentro da página do LinkedIn (via page.evaluate): o HTML da busca não traz o URN do post, só as props
+ * React do nó. Copia o primeiro `urn:li:activity:<id>` delas para `data-urn`, de onde o app tira id, data e link.
+ * Autocontida de propósito: o Playwright serializa a função e ela não enxerga nada deste módulo.
+ * @param {ParentNode} [root]
+ */
+export function tagActivityUrns(root = document) {
+  // Pula o que leva a ciclos ou a nós do DOM: o fiber dono (_owner) e elementos HTML.
+  const skip = (key, value) => (key === "_owner" || (value && typeof value === "object" && value.nodeType) ? undefined : value);
+  for (const el of root.querySelectorAll('[role="listitem"]')) {
+    const key = Object.keys(el).find((k) => k.startsWith("__reactProps$"));
+    if (!key) continue;
+    let json = "";
+    try {
+      json = JSON.stringify(el[key], skip) ?? "";
+    } catch {
+      continue;
+    }
+    const urn = /urn:li:activity:\d+/.exec(json)?.[0];
+    if (urn) el.setAttribute("data-urn", urn);
+  }
+}
+
+/**
  * Minimiza a janela assim que o Chrome abre: a busca roda em segundo plano. Sem janela (headless) os sites
  * bloqueiam, e o macOS ignora `--start-minimized`, então a janela pisca só na abertura.
  * @param {import("playwright-core").BrowserContext} ctx
@@ -123,6 +146,7 @@ export function createBrowserRunner({ profileDir, launch = launchChrome, idleMs 
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
             await page.waitForTimeout(SCROLL_WAIT_MS);
           }
+          if (LINKEDIN.test(url.hostname)) await page.evaluate(tagActivityUrns);
           return { status, html: await page.content(), blocked: false };
         } finally {
           page.off("response", onResponse);

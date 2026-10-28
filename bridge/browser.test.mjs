@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createBrowserRunner, minimizeWindow } from "./browser.mjs";
+import { createBrowserRunner, minimizeWindow, tagActivityUrns } from "./browser.mjs";
 
 /** Chrome falso com a mesma forma do contexto do Playwright usada pelo executor. */
 function fakeChrome({ title = "Vagas | Indeed", found = true, html = "<html>vagas</html>", statuses = [200], finalUrl = null } = {}) {
@@ -8,13 +8,15 @@ function fakeChrome({ title = "Vagas | Indeed", found = true, html = "<html>vaga
   const page = {
     visited: [],
     scrolls: 0,
+    tagged: 0,
     waits: [],
     selectorWaits: 0,
     url() {
       return finalUrl ?? this.visited[this.visited.length - 1] ?? "about:blank";
     },
-    async evaluate() {
-      this.scrolls++;
+    async evaluate(fn) {
+      if (fn === tagActivityUrns) this.tagged++;
+      else this.scrolls++;
     },
     async waitForTimeout(ms) {
       this.waits.push(ms);
@@ -151,6 +153,16 @@ describe("browser runner on linkedin", () => {
     await runner.close();
   });
 
+  it("tags each post with its activity urn after scrolling, only on linkedin", async () => {
+    const chrome = fakeChrome();
+    const runner = createBrowserRunner({ profileDir: "/tmp/x", launch: chrome.launch });
+    await runner.run({ ...posts, scrolls: 3 });
+    expect(chrome.page.tagged).toBe(1);
+    await runner.run(payload);
+    expect(chrome.page.tagged).toBe(1);
+    await runner.close();
+  });
+
   it("reports loginRequired on the login wall without waiting for the selector", async () => {
     for (const finalUrl of [
       "https://www.linkedin.com/authwall?trk=x",
@@ -199,5 +211,42 @@ describe("minimizeWindow", () => {
       ["Browser.setWindowBounds", { windowId: 7, bounds: { windowState: "minimized" } }],
     ]);
     expect(detached).toBe(true);
+  });
+});
+
+describe("tagActivityUrns", () => {
+  /** Elemento falso com as props React que o LinkedIn pendura no nó do post. */
+  function item(props) {
+    const attrs = {};
+    return {
+      attrs,
+      ["__reactProps$x1y2"]: props,
+      getAttribute: (k) => attrs[k] ?? null,
+      setAttribute: (k, v) => {
+        attrs[k] = v;
+      },
+    };
+  }
+  const root = (items) => ({ querySelectorAll: (sel) => (sel === '[role="listitem"]' ? items : []) });
+
+  it("writes the first activity urn found in the post's react props as data-urn", () => {
+    const owner = { name: "fiber" };
+    owner.self = owner;
+    const a = item({ children: { _owner: owner, props: { updateUrn: "urn:li:activity:7520957626956795904" } } });
+    const b = item({ children: [{ props: { node: { nodeType: 1 } } }, { key: "urn:li:activity:7520953699654033408-x" }] });
+    tagActivityUrns(root([a, b]));
+    expect(a.attrs["data-urn"]).toBe("urn:li:activity:7520957626956795904");
+    expect(b.attrs["data-urn"]).toBe("urn:li:activity:7520953699654033408");
+  });
+
+  it("leaves posts without an urn (or with unserializable props) untouched", () => {
+    const loop = {};
+    loop.again = loop;
+    const none = item({ children: "sem urn" });
+    const broken = item({ loop });
+    const bare = { getAttribute: () => null, setAttribute: () => expect.unreachable() };
+    tagActivityUrns(root([none, broken, bare]));
+    expect(none.attrs).toEqual({});
+    expect(broken.attrs).toEqual({});
   });
 });

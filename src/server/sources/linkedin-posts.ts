@@ -9,14 +9,22 @@ import type { JobSource, RawJob } from "./types";
 export const LINKEDIN_POSTS_URL =
   "https://www.linkedin.com/search/results/content/?keywords=%22desenvolvedor%22%20and%20%22contratando%22%20%20&origin=FACETED_SEARCH&sortBy=%5B%22date_posted%22%5D&datePosted=%5B%22past-24h%22%5D";
 
-// Seletores do DOM da busca de conteúdo (ver comentário no topo da fixture). O LinkedIn muda classes; o data-urn é o mais estável.
+// Seletores do DOM da busca de conteúdo (ver comentário no topo da fixture). As classes são ofuscadas; data-view-name e
+// data-testid são o que fica. O data-urn não vem do LinkedIn: o ajudante grava a partir das props React do post.
 export const POST_SELECTOR = '[data-urn^="urn:li:activity:"]';
-const TEXT_SELECTOR = ".update-components-text";
-const AUTHOR_SELECTOR = '.update-components-actor__title span[aria-hidden="true"]';
+export const POST_READY = '[data-view-name="feed-full-update"]';
+const TEXT_SELECTOR = '[data-view-name="feed-commentary"] [data-testid="expandable-text-box"]';
+const EXPAND_BUTTON = '[data-testid="expandable-text-button"]';
+const AUTHOR_SELECTOR = '[data-view-name="feed-actor"] p > span';
 
 const SCROLLS = 3;
 // Estado "nenhum resultado" do LinkedIn: zero posts de verdade, diferente de uma página que mudou de layout.
-const EMPTY_STATE = ".search-reusable-search-no-results, .artdeco-empty-state";
+// Sem classe estável; o título é o sinal (o Chrome do ajudante abre em pt-BR).
+const EMPTY_TITLE = /^(Nenhum resultado encontrado|No results found)$/;
+
+function isEmptyResults($: cheerio.CheerioAPI): boolean {
+  return $("h1, h2, h3").toArray().some((el) => EMPTY_TITLE.test($(el).text().trim()));
+}
 const TITLE_MAX = 100;
 const ROLE = /desenvolvedor|desenvolvedora|developer|engenheir|engineer|programador|\bdev\b|tech lead|full ?stack|front-?end|back-?end/i;
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
@@ -50,7 +58,9 @@ export function parseLinkedinPosts(html: string): RawJob[] {
   const posts: RawJob[] = [];
   $(POST_SELECTOR).each((_, el) => {
     const id = /urn:li:activity:(\d+)/.exec($(el).attr("data-urn") ?? "")?.[1];
-    const markup = $(el).find(TEXT_SELECTOR).first().html();
+    const box = $(el).find(TEXT_SELECTOR).first().clone();
+    box.find(EXPAND_BUTTON).remove();
+    const markup = box.html();
     const text = markup ? htmlToText(markup) : "";
     if (!id || !text) return;
     const author = $(el).find(AUTHOR_SELECTOR).first().text().replace(/\s+/g, " ").trim();
@@ -85,10 +95,10 @@ export const linkedinPostsSource: JobSource = {
   maxPages: 1,
   fixedQueries: [{ keywords: '"desenvolvedor" and "contratando"', location: null }],
   async search(_q, _page, _http, ctx) {
-    const html = await requireBrowser(ctx).getHtml(LINKEDIN_POSTS_URL, { waitFor: POST_SELECTOR, scrolls: SCROLLS });
+    const html = await requireBrowser(ctx).getHtml(LINKEDIN_POSTS_URL, { waitFor: POST_READY, scrolls: SCROLLS });
     // Sem posts e sem o estado vazio: os seletores quebraram. Vira erro na fonte, não "ok, 0 vagas" para sempre.
     const $ = cheerio.load(html);
-    if ($(POST_SELECTOR).length === 0 && $(EMPTY_STATE).length === 0) {
+    if ($(POST_SELECTOR).length === 0 && !isEmptyResults($)) {
       throw new HttpError("não achei posts na página: o LinkedIn pode ter mudado o layout");
     }
     return parseLinkedinPosts(html);

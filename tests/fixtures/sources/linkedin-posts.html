@@ -1,76 +1,60 @@
-<!-- SINTÉTICA (Task 7): marcação do DOM conhecido da busca de conteúdo do LinkedIn, dados fictícios.
-     Trocar por captura real anonimizada na Task 6 (make linkedin-login + captura).
-     POST_SELECTOR: [data-urn^="urn:li:activity:"] | TEXT: .update-components-text | AUTHOR: .update-components-actor__title span[aria-hidden="true"] -->
+<!-- REAL ANONIMIZADA (Task 6, captura de 2026-10-27): esqueleto da busca de conteúdo do LinkedIn, todo dado trocado por fictício.
+     O HTML do LinkedIn não traz o URN do post: o ajudante (bridge/browser.mjs, tagActivityUrns) grava data-urn em cada
+     [role="listitem"] a partir das props React. Esta fixture é o HTML como o ajudante devolve ao app.
+     POST_SELECTOR: [data-urn^="urn:li:activity:"] | PRONTO: [data-view-name="feed-full-update"]
+     TEXT: [data-view-name="feed-commentary"] [data-testid="expandable-text-box"] (sem [data-testid="expandable-text-button"], o "… mais")
+     AUTHOR: [data-view-name="feed-actor"] p > span (o primeiro; o segundo é o grau de conexão) -->
 <!DOCTYPE html>
-<html lang="pt">
-<head><title>Pesquisa | LinkedIn</title></head>
+<html lang="pt-BR">
+<head><title>Pesquisar | LinkedIn</title></head>
 <body>
-<main class="scaffold-layout__main">
-  <div class="search-results-container">
-    <ul role="list" class="reusable-search__entity-result-list">
-      <li class="artdeco-card mb2">
-        <div class="feed-shared-update-v2 feed-shared-update-v2--minimal-padding" data-urn="urn:li:activity:7518974430412812345" role="article">
-          <div class="update-components-actor display-flex">
-            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-a">
-              <span class="update-components-actor__title">
-                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora A<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora A<!----></span></span>
-              </span>
-              <span class="update-components-actor__description"><span aria-hidden="true">Tech Recruiter na Exemplo</span></span>
-              <span class="update-components-actor__sub-description"><span aria-hidden="true">2 h • </span></span>
-            </a>
-          </div>
-          <div class="feed-shared-update-v2__description-wrapper">
-            <div class="feed-shared-inline-show-more-text">
-              <div class="update-components-text relative update-components-update-v2__commentary" dir="ltr">
-                <span class="break-words tvm-parent-container"><span dir="ltr">Estamos contratando!<br><br>Vaga: Desenvolvedor PHP Pleno (remoto)<br>Stack: PHP 8, Laravel, MySQL.<br>Envie seu CV para vagas@exemplo.com.br.</span></span>
-              </div>
-              <button class="feed-shared-inline-show-more-text__see-more-less-toggle" aria-label="ver mais">…ver mais</button>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="artdeco-card mb2">
-        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518951781171212345" role="article">
-          <div class="update-components-actor display-flex">
-            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-b">
-              <span class="update-components-actor__title">
-                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora B<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora B<!----></span></span>
-              </span>
-              <span class="update-components-actor__description"><span aria-hidden="true">Head de Engenharia</span></span>
-            </a>
-          </div>
-          <div class="feed-shared-update-v2__description-wrapper">
-            <div class="update-components-text relative" dir="ltr">
-              <span class="break-words"><span dir="ltr">Procuramos dev React sênior, híbrido em SP. Me chama no direct!</span></span>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="artdeco-card mb2">
-        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518797011353612345" role="article">
-          <div class="update-components-actor display-flex">
-            <a class="update-components-actor__meta-link" href="https://www.linkedin.com/in/exemplo-c">
-              <span class="update-components-actor__title">
-                <span dir="ltr"><span aria-hidden="true"><!---->Pessoa Recrutadora C<!----></span><span class="visually-hidden"><!---->Pessoa Recrutadora C<!----></span></span>
-              </span>
-            </a>
-          </div>
-          <div class="feed-shared-update-v2__description-wrapper">
-            <div class="update-components-text relative" dir="ltr">
-              <span class="break-words"><span dir="ltr">#contratando<br>Desenvolvedora Full Stack (Node e React), CLT, 100% remoto.<br>Não responda para noreply@exemplo.com.<br>Currículos: RH@Exemplo.com ou talentos@exemplo.com</span></span>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="artdeco-card mb2">
-        <div class="feed-shared-update-v2" data-urn="urn:li:activity:7518797011353699999" role="article">
-          <div class="update-components-actor display-flex">
-            <span class="update-components-actor__title"><span aria-hidden="true">Post sem texto</span></span>
-          </div>
-        </div>
-      </li>
-    </ul>
+<main>
+<div data-testid="lazy-column" data-component-type="LazyColumn">
+
+<div class="ajrlr8 ajru5 ajrzx ajr4p" role="listitem" componentkey="expandedAAAAFeedType_" data-urn="urn:li:activity:7518974430412812345">
+  <div class="ajrax7 ajrluf" data-view-name="feed-full-update" data-display-contents="true">
+    <a tabindex="0" href="https://www.linkedin.com/in/pessoa-a/" data-view-name="feed-actor">
+      <div><div><div><div aria-label="Pessoa Recrutadora A"><div><div><p><span>Pessoa Recrutadora A</span></p></div></div>
+        <div><p><span>• 2º<span></span><span aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 16 16"><path d=""></path></svg></span><span></span></span></p></div>
+      </div></div></div></div>
+    </a>
+    <p class="ajrk8d" componentkey="c-a" data-view-name="feed-commentary"><span class="ajrllu" tabindex="-1" data-testid="expandable-text-box">Estamos contratando! 🚀<br>Vaga: Desenvolvedor PHP Pleno (remoto)<br><br>Envie seu CV para <a class="ajrhc3" aria-label="Abrir mailto:vagas@exemplo.com.br" href="mailto:vagas@exemplo.com.br" target="_blank" data-view-name="feed-commentary" tabindex="-1"><strong>vagas@exemplo.com.br</strong></a>.<br><br><span class="ajrgb5"><a class="ajrhc3" aria-label="Abrir https://lnkd.in/exemplo" href="https://www.linkedin.com/safety/go/?url=https%3A%2F%2Flnkd%2Ein%2Fexemplo" data-view-name="feed-commentary" tabindex="-1">https://lnkd.in/exemplo</a></span><br><a class="ajrhc3" aria-label="Ver hashtag: #vagas" href="https://www.linkedin.com/search/results/all/?keywords=%23vagas&amp;origin=HASH_TAG_FROM_FEED" data-view-name="feed-commentary" tabindex="-1"><strong>#vagas</strong></a><button type="button" aria-hidden="true" data-testid="expandable-text-button"><span>… mais</span></button></span></p>
   </div>
+</div>
+
+<div class="ajrlr8 ajru5 ajrzx ajr4p" role="listitem" componentkey="expandedBBBBFeedType_" data-urn="urn:li:activity:7518951781171212345">
+  <div class="ajrax7 ajrluf" data-view-name="feed-full-update" data-display-contents="true">
+    <a tabindex="0" href="https://www.linkedin.com/in/pessoa-b/" data-view-name="feed-actor">
+      <div><div><div><div aria-label="Pessoa Recrutadora B"><div><div><p><span>Pessoa Recrutadora B</span></p></div></div>
+        <div><p><span>• 3º+<span></span></span></p></div>
+      </div></div></div></div>
+    </a>
+    <p class="ajrk8d" componentkey="c-b" data-view-name="feed-commentary"><span class="ajrllu" tabindex="-1" data-testid="expandable-text-box">Procuramos dev React sênior, híbrido em SP. Me chama no direct!<button type="button" aria-hidden="true" data-testid="expandable-text-button"><span>… mais</span></button></span></p>
+  </div>
+</div>
+
+<div class="ajrlr8 ajru5 ajrzx ajr4p" role="listitem" componentkey="update-card-focusCCCC" data-urn="urn:li:activity:7518797011353612345">
+  <div class="ajrax7 ajrluf" data-view-name="feed-full-update" data-display-contents="true">
+    <a tabindex="0" href="https://www.linkedin.com/company/empresa-c/" data-view-name="feed-actor">
+      <div><div><div><div aria-label="Pessoa Recrutadora C"><div><div><p><span>Pessoa Recrutadora C</span></p></div></div>
+        <div><p><span><span></span><span aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 16 16"><path d=""></path></svg></span></span></p></div>
+      </div></div></div></div>
+    </a>
+    <p class="ajrk8d" componentkey="c-c" data-view-name="feed-commentary"><span class="ajrllu" tabindex="-1" data-testid="expandable-text-box">Vaga aberta: Desenvolvedora Full Stack<br><br>Não responda para <a aria-label="Abrir mailto:noreply@exemplo.com" href="mailto:noreply@exemplo.com" data-view-name="feed-commentary" tabindex="-1"><strong>noreply@exemplo.com</strong></a>; currículos para <a aria-label="Abrir mailto:RH@Exemplo.com" href="mailto:RH@Exemplo.com" data-view-name="feed-commentary" tabindex="-1"><strong>RH@Exemplo.com</strong></a> ou <a aria-label="Abrir mailto:talentos@exemplo.com" href="mailto:talentos@exemplo.com" data-view-name="feed-commentary" tabindex="-1"><strong>talentos@exemplo.com</strong></a><button type="button" aria-hidden="true" data-testid="expandable-text-button"><span>… mais</span></button></span></p>
+  </div>
+</div>
+
+<!-- Post só com imagem: sem texto, é ignorado. -->
+<div class="ajrlr8 ajru5 ajrzx ajr4p" role="listitem" componentkey="update-card-focusDDDD" data-urn="urn:li:activity:7518700000000012345">
+  <div class="ajrax7 ajrluf" data-view-name="feed-full-update" data-display-contents="true">
+    <a tabindex="0" href="https://www.linkedin.com/in/pessoa-d/" data-view-name="feed-actor">
+      <div><div><div><div aria-label="Pessoa D"><div><div><p><span>Pessoa D</span></p></div></div></div></div></div></div>
+    </a>
+    <div data-view-name="feed-update-image"></div>
+  </div>
+</div>
+
+</div>
 </main>
 </body>
 </html>
